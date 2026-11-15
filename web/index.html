@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>카 이스케이프</title>
+<meta name="description" content="충전하는 동안, 우리 차가 방탈출 게임이 됩니다. 아이오닉 9 가족 방탈출 웹 체험판.">
+<meta name="theme-color" content="#05080F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%2305080F' stroke='%23E8B962' stroke-width='10'/%3E%3Ccircle cx='50' cy='44' r='10' fill='%23E8B962'/%3E%3Cpath d='M45 47.5h10l3.5 23.5h-17z' fill='%23E8B962'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Asta+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page" id="page">
+  <header class="pv-top" id="pv-top">
+    <div class="pv-brand">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#E8B962" stroke-width="8"/><circle cx="50" cy="44" r="10" fill="#E8B962"/><path d="M45 47.5h10l3.5 23.5h-17z" fill="#E8B962"/></svg>
+      <b>카 이스케이프</b><span class="pv-tag">제출용 시연</span>
+    </div>
+    <label class="pv-field"><span>화면 규격</span>
+      <select id="pl-screen" aria-label="Pleos Connect 화면 규격">
+        <option value="S17_LAND">Connect-S 17" · 단독 1700×1184 dp</option>
+        <option value="S17_PORT">Connect-S 17" · 분할 840×1184 dp</option>
+        <option value="S146_LAND">Connect-S 14.6" · 단독 1360×948 dp</option>
+        <option value="S146_PORT">Connect-S 14.6" · 분할 672×948 dp</option>
+        <option value="S129_LAND">Connect-S 12.9" · 단독 1274×855 dp</option>
+        <option value="S129_PORT">Connect-S 12.9" · 분할 628×855 dp</option>
+        <option value="WS_LAND">Connect-WS 24.6" · 단독 1640×810 dp</option>
+        <option value="WS_PORT">Connect-WS 24.6" · 분할 800×810 dp</option>
+        <option value="WE_LAND">Connect-WE 24.6" · 단독 1640×1400 dp</option>
+        <option value="WE_PORT">Connect-WE 24.6" · 분할 800×1400 dp</option>
+        <option value="WF_LAND">Connect-WF 18.7" · 단독 1256×800 dp</option>
+        <option value="WF_PORT">Connect-WF 18.7" · 분할 648×800 dp</option>
+      </select>
+    </label>
+    <div class="seg pl-seg" role="group" aria-label="시스템 테마">
+      <button type="button" data-pl-mode="dark">다크</button><button type="button" data-pl-mode="light">라이트</button>
+    </div>
+    <span class="pv-sp"></span>
+    <button type="button" class="pv-btn" id="pv-full">전체화면</button>
+  </header>
+  <main class="stage">
+    <section class="frame" id="frame" aria-label="카 이스케이프 차량 화면">
+      <div class="pl-fit" id="pl-fit">
+        <div class="pl-shell" id="pl-shell">
+        <div class="pl-dev" id="pl-dev">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+            <defs>
+              <symbol id="pi-lock" viewBox="0 0 48 48"><path d="M14 22V14Q14 6 22 6Q28 6 30 11" fill="none" stroke="currentColor" stroke-width="3.5"/><rect x="8" y="22" width="26" height="20" fill="currentColor"/><rect x="19" y="29" width="4" height="7" fill="var(--pl-sb)"/></symbol>
+              <symbol id="pi-search" viewBox="0 0 48 48"><circle cx="21" cy="21" r="12" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M30 30L41 41" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></symbol>
+              <symbol id="pi-bt" viewBox="0 0 48 48"><path d="M14 15L32 32L24 40V8L32 16L14 33" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/></symbol>
+              <symbol id="pi-signal" viewBox="0 0 48 48"><g fill="currentColor"><rect x="10" y="32" width="5" height="10"/><rect x="19" y="26" width="5" height="16"/><rect x="28" y="20" width="5" height="22" opacity=".35"/><rect x="37" y="12" width="5" height="30" opacity=".35"/></g><path d="M8 6L16 14M16 6L8 14" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-ad" viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 22Q24 14 40 22M24 41V31M17 26L24 31L31 26" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-belt" viewBox="0 0 120 80"><path d="M6 70L58 26" stroke="#9AA0A8" stroke-width="16"/><path d="M66 22L114 2" stroke="#9AA0A8" stroke-width="12" opacity=".6"/><rect x="44" y="16" width="30" height="24" rx="3" transform="rotate(-38 59 28)" fill="#C9CDD2"/><path d="M74 20l18 -14" stroke="#2F7BFF" stroke-width="12"/><path d="M60 30l14 -12l-2 12z" fill="#2F7BFF"/></symbol>
+              <symbol id="pi-door" viewBox="0 0 48 48"><path d="M8 34V20Q8 12 16 12H40V34Z M8 24H40" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M30 29H18M22 25L18 29L22 33" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+              <symbol id="pi-trunk" viewBox="0 0 48 48"><path d="M6 32H14L20 26H34L40 32V36H6Z M12 10Q8 14 10 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="15" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M10 9L14 8L13 12" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-frunk" viewBox="0 0 48 48"><path d="M42 32H34L28 26H14L8 32V36H42Z M36 10Q40 14 38 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="33" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M38 9L34 8L35 12" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-port" viewBox="0 0 48 48"><path d="M6 10H34L30 40H4Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M21 14L14 26H21L18 36L27 22H20Z" fill="currentColor"/><path d="M40 36V20M36 24L40 18L44 24" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-window" viewBox="0 0 48 48"><path d="M4 22L12 10H34V40H4Z M4 24H34" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M42 8V30M38 26L42 32L46 26" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-mirror" viewBox="0 0 48 48"><path d="M6 24Q6 12 20 12H36V36H14Q6 36 6 24Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M28 24H14M18 20L14 24L18 28" fill="none" stroke="currentColor" stroke-width="3"/><path d="M36 36H44" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-light" viewBox="0 0 48 48"><path d="M10 22Q24 10 38 22Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M24 28V40M14 28L8 36M34 28L40 36M4 22H8M40 22H44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+              <symbol id="pi-sunroof" viewBox="0 0 48 48"><rect x="8" y="10" width="32" height="28" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 16H40M14 22L32 36M32 22L14 36" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-glove" viewBox="0 0 48 48"><path d="M6 14H42L38 38H10Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M18 22H30" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-down" viewBox="0 0 48 48"><path d="M10 18L24 32L38 18" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+              <symbol id="pi-up" viewBox="0 0 48 48"><path d="M10 30L24 16L38 30" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+              <symbol id="pi-fan" viewBox="0 0 48 48"><g fill="currentColor"><ellipse cx="24" cy="13" rx="6" ry="10"/><ellipse cx="24" cy="35" rx="6" ry="10"/><ellipse cx="13" cy="24" rx="10" ry="6"/><ellipse cx="35" cy="24" rx="10" ry="6"/></g><circle cx="24" cy="24" r="4" fill="#000"/></symbol>
+              <symbol id="pi-defrost" viewBox="0 0 48 48"><path d="M4 18Q24 4 44 18L40 30H8Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M16 14Q14 10 16 6M24 12Q22 8 24 4M32 14Q30 10 32 6" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M8 44L40 4" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-seat" viewBox="0 0 48 48"><path d="M10 8L16 32H34V40H12L4 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M26 6Q24 10 26 14T26 22M34 6Q32 10 34 14T34 22M42 6Q40 10 42 14T42 22" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+              <symbol id="pi-wheel" viewBox="0 0 48 48"><circle cx="22" cy="26" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path d="M6 24Q22 18 38 24M22 43V32" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 4Q30 8 32 12M38 4Q36 8 38 12M44 4Q42 8 44 12" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+              <symbol id="pi-recirc" viewBox="0 0 48 48"><path d="M6 36H12L18 28H36L44 36V40H6Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M14 22Q24 6 36 18M36 18V10M36 18H28" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+              <symbol id="pi-auto" viewBox="0 0 48 48"><path d="M6 20L12 4L18 20M8 14H16" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="currentColor"/><path d="M34 18L24 34L14 40M26 30L36 34" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+              <symbol id="pi-car" viewBox="0 0 48 48"><path d="M8 24L13 12H35L40 24V36H8Z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M8 24H40" stroke="currentColor" stroke-width="3.5"/><circle cx="15" cy="30" r="2.5" fill="currentColor"/><circle cx="33" cy="30" r="2.5" fill="currentColor"/></symbol>
+              <symbol id="pi-nav" viewBox="0 0 48 48"><path d="M24 4L40 42L24 34L8 42Z" fill="currentColor"/></symbol>
+              <symbol id="pi-phone" viewBox="0 0 48 48"><path d="M12 6L20 8L22 16L17 20Q22 30 30 32L34 28L42 30L42 38Q40 44 34 42Q12 36 6 14Q5 8 12 6Z" fill="currentColor"/></symbol>
+              <symbol id="pi-grid" viewBox="0 0 48 48"><g fill="currentColor"><rect x="6" y="6" width="16" height="16"/><rect x="26" y="6" width="16" height="16"/><rect x="6" y="26" width="16" height="16"/><rect x="26" y="26" width="16" height="16"/></g></symbol>
+              <symbol id="pi-key" viewBox="0 0 48 48"><circle cx="24" cy="16" r="7" fill="#E8B962"/><path d="M20 20H28L31 40H17Z" fill="#E8B962"/></symbol>
+              <symbol id="pi-term" viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="32" fill="none" stroke="currentColor" stroke-width="3"/><path d="M4 15H44M12 22L18 27L12 32M22 33H32" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+            </defs>
+          </svg>
+          <aside class="pl-drive" aria-label="주행 정보 화면"><div class="pl-dv" id="pl-dv">
+            <div class="pl-top">
+              <span class="pl-batt"><i><em id="pl-socbar" style="width:42%"></em></i><b id="pl-soc">42%</b></span>
+              <span class="pl-kmh" id="pl-kmh">0<small>km/h</small></span>
+              <span class="pl-gear" id="pl-gear"><b>P</b><span>R</span><span>N</span><span>D</span></span>
+            </div>
+            <div class="pl-ad"><svg><use href="#pi-ad"/></svg><span>- -</span></div>
+            <div class="pl-speed" id="pl-speedbox"><b id="pl-speed">0</b><small>km/h</small></div>
+            <div class="pl-belt" id="pl-belt"><svg viewBox="0 0 120 80"><use href="#pi-belt"/></svg><span>안전 벨트를 매세요.</span></div>
+            <div class="pl-mode" id="pl-mode">모드 정보 없음</div>
+            <div class="pl-car" id="pl-car"></div>
+            <div class="pl-doors" aria-hidden="true"><i style="left:273px;top:395px"><svg><use href="#pi-door"/></svg></i><i style="left:143px;top:459px"><svg><use href="#pi-door"/></svg></i><i style="left:545px;top:626px"><svg><use href="#pi-door"/></svg></i><i style="left:415px;top:706px"><svg><use href="#pi-door"/></svg></i></div>
+            <div class="pl-acts"><svg><use href="#pi-trunk"/></svg><svg class="off"><use href="#pi-frunk"/></svg><svg><use href="#pi-port"/></svg><svg><use href="#pi-window"/></svg></div>
+            <div class="pl-quick"><span><svg><use href="#pi-mirror"/></svg></span><i></i><span><svg><use href="#pi-light"/></svg></span><i></i><span class="on"><svg><use href="#pi-sunroof"/></svg></span><i></i><span><svg><use href="#pi-glove"/></svg></span></div>
+            <div class="pl-dots"><i></i><i class="on"></i><i></i><i></i></div>
+          </div></aside>
+          <div class="pl-status"><div class="pl-in">
+            <svg><use href="#pi-lock"/></svg><svg><use href="#pi-search"/></svg>
+            <span class="pl-sp"></span>
+            <span class="pl-prof">가</span><svg><use href="#pi-bt"/></svg><svg><use href="#pi-signal"/></svg><i></i><span id="pl-clock">12:00 오후</span>
+          </div></div>
+          <div class="pl-apps">
+            <div class="pl-win" id="pl-win">
+              <div class="ambient" id="ambient" aria-hidden="true"></div>
+              <div class="game" id="game" aria-live="polite"></div>
+            </div>
+            <div class="pl-win pl-other" aria-hidden="true"><div class="pl-map"></div><b>내비게이션</b><span>분할 화면의 다른 앱</span></div>
+          </div>
+          <div class="pl-handle" aria-hidden="true"><i></i><i></i><i></i></div>
+          <nav class="pl-gnb" aria-hidden="true"><div class="pl-in">
+            <div class="pl-hvac"><svg class="dn"><use href="#pi-down"/></svg><span class="pl-temp"><b><svg><use href="#pi-fan"/></svg>22.0<sup>°</sup></b><small>A/C</small></span><svg class="up"><use href="#pi-up"/></svg>
+              <svg><use href="#pi-defrost"/></svg><svg><use href="#pi-seat"/></svg><svg><use href="#pi-wheel"/></svg></div>
+            <div class="pl-dock"><span class="t"><svg><use href="#pi-car"/></svg></span><span class="t"><svg><use href="#pi-nav"/></svg></span><span class="t"><svg><use href="#pi-phone"/></svg></span><span><svg><use href="#pi-grid"/></svg></span><i></i><span class="t on"><svg><use href="#pi-key"/></svg></span><span class="t"><svg><use href="#pi-term"/></svg></span></div>
+            <div class="pl-hvac r"><svg class="mir"><use href="#pi-seat"/></svg><svg><use href="#pi-recirc"/></svg><svg><use href="#pi-auto"/></svg>
+              <svg class="dn"><use href="#pi-down"/></svg><span class="pl-temp"><b><svg><use href="#pi-fan"/></svg>22.0<sup>°</sup></b><small>A/C</small></span><svg class="up"><use href="#pi-up"/></svg></div>
+          </div></nav>
+        </div>
+        <div class="pl-seek" id="pl-seek" hidden>장면으로 이동 중</div>
+        <p class="pl-cap" id="pl-cap"></p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel" id="panel" aria-label="가상 차량">
+      <header class="p-head">
+        <div class="p-ttl"><h2>가상 차량</h2><p>실차에서는 실제 창문·벨트·깜빡이를 조작해요</p></div>
+        <button type="button" class="pv-btn p-fold" id="pv-panel-btn" aria-expanded="true" aria-controls="p-body"><span>가상 차량</span><i aria-hidden="true"></i></button>
+      </header>
+
+      <div class="p-body" id="p-body">
+      <p class="p-need" id="p-need" hidden></p>
+      <div class="p-grid">
+        <div class="p-item">
+          <span class="p-label">기어</span>
+          <div class="seg" data-seg="gear" role="group" aria-label="기어">
+            <button type="button" data-v="PARK">P</button><button type="button" data-v="DRIVE">D</button>
+          </div>
+        </div>
+        <label class="p-item">
+          <span class="p-label">속도 <b data-out="speed">0</b>km/h</span>
+          <input type="range" min="0" max="60" step="1" value="0" data-range="speed">
+        </label>
+        <div class="p-item wide">
+          <span class="p-label">주행 모드 (차가 알려 줘요 · 앱은 읽기만)</span>
+          <div class="seg" data-seg="mode" role="group" aria-label="주행 모드">
+            <button type="button" data-v="">모름</button><button type="button" data-v="NORMAL">노멀</button><button type="button" data-v="ECO">에코</button><button type="button" data-v="SPORT">스포츠</button>
+          </div>
+        </div>
+
+        <label class="p-item">
+          <span class="p-label">배터리 <b data-out="soc">42</b>%</span>
+          <input type="range" min="0" max="100" step="1" value="42" data-range="soc">
+        </label>
+        <label class="p-item">
+          <span class="p-label">충전 목표 <b data-out="target">80</b>%</span>
+          <input type="range" min="50" max="100" step="5" value="80" data-range="target">
+        </label>
+
+        <label class="p-item toggle"><span>충전 중</span><input type="checkbox" role="switch" data-toggle="charging" checked></label>
+        <label class="p-item toggle"><span>타임랩스 충전 x30</span><input type="checkbox" role="switch" data-toggle="timelapse"></label>
+
+        <label class="p-item toggle wide"><span>충전구 열림<small>충전구를 열면 다음 화 카드가 떠요</small></span><input type="checkbox" role="switch" data-toggle="port"></label>
+        <label class="p-item toggle"><span>문 열림<small>열면 잠시 멈춰요</small></span><input type="checkbox" role="switch" data-toggle="door"></label>
+        <label class="p-item toggle"><span>2열 창문 잠금<small>차일드락</small></span><input type="checkbox" role="switch" data-toggle="rearlock"></label>
+        <label class="p-item toggle wide"><span>주행 가능 거리 <b data-out="range">210km</b><small>충전되면 함께 늘어나요</small></span><input type="checkbox" role="switch" data-toggle="range" checked></label>
+
+        <label class="p-item">
+          <span class="p-label">운전석 창문 <b data-out="win:driver">0</b>%</span>
+          <input type="range" min="0" max="100" step="1" value="0" data-range="win:driver">
+        </label>
+        <label class="p-item">
+          <span class="p-label">조수석 창문 <b data-out="win:ROW_1_RIGHT">0</b>%</span>
+          <input type="range" min="0" max="100" step="1" value="0" data-range="win:ROW_1_RIGHT">
+        </label>
+        <label class="p-item">
+          <span class="p-label">2열 왼쪽 창문 <b data-out="win:ROW_2_LEFT">0</b>%</span>
+          <input type="range" min="0" max="100" step="1" value="0" data-range="win:ROW_2_LEFT">
+        </label>
+        <label class="p-item">
+          <span class="p-label">2열 오른쪽 창문 <b data-out="win:ROW_2_RIGHT">0</b>%</span>
+          <input type="range" min="0" max="100" step="1" value="0" data-range="win:ROW_2_RIGHT">
+        </label>
+
+        <div class="p-item">
+          <span class="p-label">독서등</span>
+          <button type="button" class="hold" data-hold="light" aria-pressed="false">누르고 있는 동안 켜짐</button>
+        </div>
+        <div class="p-item">
+          <span class="p-label">와이퍼 (한 번만 닦기)</span>
+          <button type="button" class="hold" data-hold="wiper" aria-pressed="false">톡 누르면 한 번 닦기</button>
+        </div>
+
+        <div class="p-item">
+          <span class="p-label">깜빡이</span>
+          <div class="seg" data-seg="turn" role="group" aria-label="깜빡이">
+            <button type="button" data-v="LEFT">좌</button><button type="button" data-v="OFF">끔</button><button type="button" data-v="RIGHT">우</button>
+          </div>
+        </div>
+        <div class="p-item">
+          <span class="p-label">핸들 열선</span>
+          <div class="seg" data-seg="steer" role="group" aria-label="핸들 열선">
+            <button type="button" data-v="0">0</button><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button>
+          </div>
+        </div>
+        <div class="p-item">
+          <span class="p-label">시트 열선 (운전석)</span>
+          <div class="seg" data-seg="seat" role="group" aria-label="시트 열선">
+            <button type="button" data-v="0">0</button><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button><button type="button" data-v="3">3</button>
+          </div>
+        </div>
+
+        <div class="p-item wide">
+          <span class="p-label">안전벨트 (탭 = 찰칵 / 풀기)</span>
+          <div class="belts" role="group" aria-label="안전벨트">
+            <div class="row"><button type="button" data-belt="ROW_1_LEFT">운전석</button><button type="button" data-belt="ROW_1_RIGHT">조수석</button></div>
+            <div class="row"><button type="button" data-belt="ROW_2_LEFT">2열 왼쪽</button><button type="button" data-belt="ROW_2_CENTER">2열 가운데</button><button type="button" data-belt="ROW_2_RIGHT">2열 오른쪽</button></div>
+            <div class="row"><button type="button" data-belt="ROW_3_LEFT">3열 왼쪽</button><button type="button" data-belt="ROW_3_RIGHT">3열 오른쪽</button></div>
+          </div>
+        </div>
+
+        <label class="p-item toggle wide"><span>음성 안내 · 효과음</span><input type="checkbox" role="switch" data-toggle="sound" checked></label>
+      </div>
+      </div>
+    </aside>
+  </main>
+  <nav class="pv-bar" id="pv-bar" aria-label="시연 진행">
+    <div class="pv-ctl">
+      <button type="button" class="pv-btn primary" id="pv-auto" aria-pressed="false">자동 시연</button>
+      <button type="button" class="pv-btn" id="pv-restart" title="체험 기록을 지우고 첫 장면으로 돌아갑니다">처음부터</button>
+      <button type="button" class="pv-btn" id="pv-prev" aria-label="이전 장면">← <span>이전 장면</span></button>
+      <button type="button" class="pv-btn" id="pv-next" aria-label="다음 장면"><span>다음 장면</span> →</button>
+    </div>
+    <p class="pv-now" aria-live="polite"><b id="pv-count"></b><span id="pv-desc"></span></p>
+    <ol class="pv-steps" id="pv-steps" aria-label="장면 목록"></ol>
+  </nav>
+  <footer class="foot">웹 체험판은 실제 차량·Pleos SDK와 연결되지 않은 모사이며, 차량 상태는 가상 차량 패널로 흉내 냅니다. Hyundai, Pleos 및 관련 로고는 각 소유자의 상표입니다. 공모전 출품작의 웹 체험판이며 현대자동차·기아의 공식 서비스가 아닙니다.</footer>
+</div>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+<script src="present.js"></script>
+<script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module" src="car3d.js"></script>
+</body>
+</html>

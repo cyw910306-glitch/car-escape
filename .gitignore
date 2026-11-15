@@ -1,0 +1,17 @@
+# 빌드 산출물과 캐시
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+node_modules/
+__pycache__/
+.vercel/
+# 서명 키와 비밀값은 저장소에 두지 않는다
+signing/
+*.jks
+*.keystore
+keystore.properties
+.env*

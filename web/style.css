@@ -1,0 +1,396 @@
+/* Night cabin palette from ui/Kit.kt (object C). */
+:root {
+  --bg: #0A111E; --bg-deep: #05080F; --surface: #131C2C; --surface2: #1C2739;
+  --line: rgba(233, 220, 196, 0.25); --text: #F4F1EA; --sub: #B7C0CE; --faint: #8590A3;
+  --gold: #E8B962; --amber: #F2994A; --on-gold: #1A1305;
+  --font: 'Asta Sans', 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg-deep); color: var(--text); font-family: var(--font); }
+button, input { font: inherit; color: inherit; }
+
+/* ---------------------------------------------------------------- 시연 화면틀 (web only): top bar / car display + virtual car / scene bar / notice.
+   The car display is drawn at its fixed dp size and scaled as a whole (ui.js layoutDevice); nothing here changes the app window. */
+.page { display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+.stage { display: flex; flex: 1 1 0; min-height: 0; }
+.frame { position: relative; flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+.pv-top { flex: none; display: flex; align-items: center; gap: 8px 14px; padding: 8px 16px; min-height: 56px; font-size: 14px;
+  background: #0B0F17; color: #E6E9EE; border-bottom: 1px solid rgba(255,255,255,.12); }
+.pv-brand { display: flex; align-items: center; gap: 10px; font-size: 17px; white-space: nowrap; }
+.pv-brand svg { width: 26px; height: 26px; flex: none; }
+.pv-tag { font-size: 12px; font-weight: 600; color: #E8B962; border: 1px solid rgba(232,185,98,.55); border-radius: 99px; padding: 2px 10px; }
+.pv-field { display: flex; align-items: center; gap: 8px; min-width: 0; color: #9AA3AF; font-size: 13px; white-space: nowrap; }
+.pv-top select { min-height: 40px; min-width: 0; border-radius: 10px; padding: 0 10px; background: #1A1F27; color: #F2F4F7; border: 1px solid rgba(255,255,255,.2); font: inherit; font-size: 14px; }
+.pl-seg { display: flex; gap: 4px; width: 140px; flex: none; }
+.pv-top .pl-seg button { min-height: 40px; background: #1A1F27; color: #F2F4F7; border-color: rgba(255,255,255,.2); font-size: 14px; }
+.pv-top .pl-seg button[aria-pressed=true] { background: #E6E9EE; color: #0B0D10; border-color: #E6E9EE; }
+.pv-sp { flex: 1; }
+.pv-btn { min-height: 40px; padding: 0 14px; border-radius: 10px; background: #1A1F27; color: #F2F4F7; border: 1px solid rgba(255,255,255,.2);
+  font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.pv-btn:hover { border-color: #E8B962; }
+.pv-btn:focus-visible, .pv-top select:focus-visible, .pv-steps button:focus-visible { outline: 2px solid #E8B962; outline-offset: 2px; }
+.pv-btn:disabled { opacity: .4; cursor: default; border-color: rgba(255,255,255,.2); }
+.pv-btn.primary { background: linear-gradient(90deg, #E8B962, #F2994A); color: #1A1305; border-color: transparent; padding: 0 18px; }
+.pv-btn.primary::before { content: ''; border-left: 10px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.pv-btn.primary[aria-pressed=true]::before { border: 0; width: 10px; height: 12px; background: linear-gradient(90deg, currentColor 0 35%, transparent 35% 65%, currentColor 65%); }
+/* scene bar */
+.pv-bar { flex: none; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px; align-items: center; padding: 10px 16px;
+  background: #0B0F17; color: #E6E9EE; border-top: 1px solid rgba(255,255,255,.12); }
+.pv-ctl { display: flex; gap: 8px; }
+.pv-now { margin: 0; font-size: 15px; line-height: 1.4; min-width: 0; display: flex; gap: 10px; align-items: baseline; }
+.pv-now b { flex: none; color: #E8B962; font-weight: 700; }
+.pv-now span { color: #D5DAE2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.pv-steps { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.pv-steps::-webkit-scrollbar { display: none; }
+.pv-steps button { min-height: 32px; padding: 0 12px; border-radius: 99px; background: transparent; color: #9AA3AF; border: 1px solid rgba(255,255,255,.16);
+  font-size: 13px; white-space: nowrap; cursor: pointer; }
+.pv-steps button:hover { color: #F2F4F7; border-color: #E8B962; }
+.pv-steps .done button { color: #D5DAE2; border-color: rgba(232,185,98,.45); }
+.pv-steps .cur button { background: #E8B962; color: #1A1305; border-color: #E8B962; font-weight: 700; }
+
+/* ---------------------------------------------------------------- Pleos Connect display mock (web only)
+   The app window (.pl-win) is the official FormFactorConsole size in dp, 1 CSS px = 1 dp; the whole display is
+   scaled to fit with a transform, so the game lays out exactly as at that window size. Chrome around it is illustrative. */
+.pl-fit { position: relative; flex: 1; min-height: 0; overflow: hidden;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, #1A2130, #0A0D13 75%); }
+/* thin device bezel + the caption under it; ui.js sizes and centres the shell */
+.pl-shell { position: absolute; border-radius: 14px; background: #05070A; box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 18px 50px rgba(0,0,0,.55); }
+.pl-cap { position: absolute; left: 0; right: 0; top: 100%; margin: 8px 0 0; text-align: center; font-size: 13px; line-height: 18px; color: #9AA3AF;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.pl-seek { position: absolute; inset: 0; z-index: 5; border-radius: inherit; background: rgba(5,7,10,.82); color: #E6E9EE; font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; }
+.pl-seek[hidden] { display: none; }
+/* Graphite theme, measured on the Pleos Connect emulator (docs/pleos/components/spec.md, tokens.json emulator_graphite):
+   square corners, black GNB in both modes, inverted selection. Status bar 90 / GNB 140 / driving view 853x1300 dp on the 17";
+   the chrome scales with --k (= window height / 1210) so the app window keeps its official dp. Icons are our own simple SVGs. */
+.pl-dev { position: absolute; left: var(--bz, 0px); top: var(--bz, 0px); transform-origin: 0 0; display: grid; font-family: var(--font); overflow: hidden;
+  --pl-sb: #000000; --pl-sbline: #353535; --pl-dv: #000000; --pl-app: #151515; --pl-text: #DDDDDD; --pl-sub: #ADADAD; --pl-faint: #797979;
+  --pl-gear-bg: #CCCCCC; --pl-gear-fg: #000000; --pl-div: #333333; --pl-quick: #151515; --pl-speed: #C8C8C8; --pl-unit: #565656; --pl-accent: #0082FF;
+  background: var(--pl-sb); color: var(--pl-text); }
+.pl-dev.light { --pl-sb: #F7F7F7; --pl-sbline: #A6A6A6; --pl-dv: #FFFFFF; --pl-app: #FFFFFF; --pl-text: #000000; --pl-sub: #7C7C7C; --pl-faint: #ADADAD;
+  --pl-gear-bg: #333333; --pl-gear-fg: #FFFFFF; --pl-div: #A6A6A6; --pl-quick: #FFFFFF; --pl-speed: #000000; --pl-unit: #7C7C7C; --pl-accent: #0064FF; }
+.pl-dev svg { fill: none; }
+.pl-in { transform: scale(var(--k)); transform-origin: 0 0; width: calc(100% / var(--k)); height: calc(100% / var(--k)); }
+/* status bar (over the app area only; the driving view runs up beside it) */
+.pl-status { grid-area: 1 / 2 / 2 / 4; overflow: hidden; background: var(--pl-sb); }
+.pl-status .pl-in { display: flex; align-items: center; gap: 52px; padding: 0 20px 0 38px; border-bottom: 1px solid var(--pl-sbline); font-size: 30px; color: var(--pl-text); }
+.pl-status svg { width: 40px; height: 40px; flex: none; color: var(--pl-text); }
+.pl-status .pl-sp { flex: 1; }
+.pl-status i { width: 2px; height: 26px; background: var(--pl-faint); margin: 0 -26px 0 -20px; }
+.pl-prof { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #BF74CC;
+  background: #FFFFFF; border: 1px solid #DDDDDD; }
+.pl-dev:not(.light) .pl-prof { background: #D9D9D9; border-color: #D9D9D9; }
+/* driving view: fixed 853x1300 dp layout, scaled */
+.pl-drive { grid-area: 1 / 1 / 3 / 2; overflow: hidden; background: var(--pl-dv); position: relative; z-index: 1; }
+.pl-dv { position: absolute; left: 0; top: 0; width: 853px; height: 1300px; transform: scale(var(--k)); transform-origin: 0 0; color: var(--pl-text); }
+.pl-dv > * { position: absolute; }
+.pl-top { left: 24px; right: 24px; top: 21px; height: 48px; display: flex; align-items: center; font-size: 30px; }
+.pl-batt { display: flex; align-items: center; gap: 22px; flex: 1 1 0; }
+.pl-batt i { width: 72px; height: 32px; background: var(--pl-faint); position: relative; flex: none; }
+.pl-batt i::after { content: ''; position: absolute; right: -8px; top: 9px; width: 4px; height: 14px; background: var(--pl-faint); }
+.pl-batt em { display: block; height: 100%; background: var(--pl-text); }
+.pl-dev.charging .pl-batt em { background: #00DB25; }
+.pl-batt b { font-weight: 400; }
+.pl-kmh { flex: none; color: var(--pl-sub); }
+.pl-kmh small { font-size: 22px; margin-left: 4px; }
+.pl-gear { flex: 1 1 0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; color: var(--pl-faint); letter-spacing: 0; }
+.pl-gear span, .pl-gear b { width: 32px; text-align: center; font-weight: 400; }
+.pl-gear b { width: 48px; height: 48px; line-height: 48px; background: var(--pl-gear-bg); color: var(--pl-gear-fg); }
+.pl-ad { right: 26px; top: 100px; width: 56px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--pl-faint); font-size: 22px; }
+.pl-ad svg { width: 40px; height: 40px; }
+.pl-speed { left: 0; right: 0; top: 70px; display: none; flex-direction: column; align-items: center; }
+.pl-speed b { font-size: 132px; line-height: 1; font-weight: 400; color: var(--pl-speed); }
+.pl-speed small { font-size: 30px; color: var(--pl-unit); }
+.pl-dev.drv .pl-speed { display: flex; }
+.pl-dev.drv .pl-kmh, .pl-dev.drv .pl-belt { visibility: hidden; }
+.pl-belt { left: 0; right: 0; top: 96px; display: flex; flex-direction: column; align-items: center; gap: 20px; font-size: 24px; color: var(--pl-sub); }
+.pl-belt svg { width: 230px; height: 150px; }
+.pl-belt.ok { visibility: hidden; }
+.pl-mode { left: 0; right: 0; top: 330px; text-align: center; font-size: 24px; color: var(--pl-faint); }
+.pl-mode[data-m=ECO] { color: #00BA13; }
+.pl-mode[data-m=SPORT] { color: #F62E24; }
+.pl-mode[data-m=NORMAL] { color: var(--pl-accent); }
+.pl-car { left: 0; right: 0; top: 380px; height: 520px; display: flex; align-items: center; justify-content: center; }
+.pl-dev.drv .pl-car { top: 640px; height: 340px; left: 210px; right: 210px; }
+/* door / window controls over the parked car: circles 100 (light white + soft shadow, dark #2C2C2C) [emu] */
+.pl-doors { inset: 0; pointer-events: none; }
+.pl-doors i { position: absolute; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #2C2C2C; color: var(--pl-text); }
+.pl-dev.light .pl-doors i { background: #FFFFFF; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06); }
+.pl-doors svg { width: 48px; height: 48px; }
+.pl-dev.drv .pl-doors { display: none; }
+.pl-acts { left: 150px; right: 150px; top: 990px; display: flex; justify-content: space-between; color: var(--pl-text); }
+.pl-acts svg, .pl-quick svg { width: 64px; height: 64px; }
+.pl-acts .off { color: var(--pl-faint); }
+.pl-dev.drv .pl-acts { display: none; }
+.pl-quick { left: 0; right: 0; top: 1120px; height: 180px; padding: 40px 60px 70px; display: flex; align-items: center; justify-content: space-around;
+  background: var(--pl-quick); border-top: 1px solid var(--pl-div); color: var(--pl-text); }
+.pl-dev.drv .pl-quick { color: var(--pl-faint); }
+.pl-quick i { width: 1px; height: 70px; background: var(--pl-div); }
+.pl-quick span { position: relative; display: flex; }
+.pl-quick span.on::after { content: ''; position: absolute; left: 18px; right: 18px; bottom: -22px; height: 5px; background: var(--pl-faint); }
+.pl-dots { left: 0; right: 0; top: 1278px; display: flex; justify-content: center; gap: 8px; }
+.pl-dots i { width: 8px; height: 8px; background: var(--pl-faint); }
+.pl-dots i.on { width: 24px; background: var(--pl-sub); }
+/* app windows: square, official dp; window bar handle on the right */
+.pl-apps { grid-area: 2 / 2 / 3 / 3; display: flex; background: var(--pl-sb); }
+.pl-win { position: relative; overflow: hidden; flex: none; background: var(--pl-app); }
+.pl-handle { grid-area: 2 / 3 / 3 / 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(6px * var(--k)); background: var(--pl-sb); }
+.pl-handle i { width: calc(6px * var(--k)); height: calc(6px * var(--k)); background: var(--pl-text); }
+.pl-other { display: none; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 40px; font-size: 30px; color: var(--pl-text); }
+.pl-other span { font-size: 24px; color: var(--pl-sub); }
+.pl-dev.split .pl-other { display: flex; }
+.pl-map { position: absolute; inset: 0; opacity: .5; background:
+  linear-gradient(115deg, transparent 46%, var(--pl-accent) 46.5%, var(--pl-accent) 48%, transparent 48.5%),
+  repeating-linear-gradient(0deg, var(--pl-div) 0 2px, transparent 2px 90px), repeating-linear-gradient(90deg, var(--pl-div) 0 2px, transparent 2px 90px); }
+.pl-other b, .pl-other span { position: relative; }
+/* GNB: black in both modes. Driver climate | dock (76 dp tiles, 116 pitch, #FF9900 bar under the running app) | passenger climate */
+.pl-gnb { grid-area: 3 / 1 / 4 / 4; overflow: hidden; background: #000000; color: #FFFFFF; }
+.pl-gnb .pl-in { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 40px; }
+.pl-gnb svg { width: 56px; height: 56px; flex: none; }
+.pl-hvac { display: flex; align-items: center; gap: 36px; }
+.pl-hvac.r { justify-content: flex-end; }
+.pl-hvac .dn { color: #0051FF; width: 48px; } .pl-hvac .up { color: #D3232A; width: 48px; }
+.pl-hvac .mir { transform: scaleX(-1); }
+.pl-temp { display: flex; flex-direction: column; align-items: center; }
+.pl-temp b { display: flex; align-items: center; font-size: 48px; font-weight: 400; line-height: 1; }
+.pl-temp b svg { width: 26px; height: 26px; margin-right: 6px; }
+.pl-temp sup { font-size: 24px; align-self: flex-start; }
+.pl-temp small { font-size: 20px; color: #00DC16; margin-top: 6px; }
+.pl-dock { display: flex; align-items: center; gap: 40px; padding: 0 60px; }
+.pl-dock span { width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; position: relative; }
+.pl-dock span svg { width: 44px; height: 44px; }
+.pl-dock .t { background: #4D4D4D; }
+.pl-dock .on { background: #1A2333; }
+.pl-dock .on::after { content: ''; position: absolute; left: 0; right: 0; bottom: -16px; height: 8px; background: #FF9900; }
+.pl-dock i { width: 2px; height: 40px; background: #333333; margin: 0 -10px; }
+.foot { flex: none; font-size: 11.5px; line-height: 1.45; color: #8590A3; padding: 6px 16px; text-align: center; border-top: 1px solid rgba(255,255,255,.08); background: #05080F; text-wrap: balance; }
+
+/* Ambient light strip: the cabin glow the game sets (GameEvent.Ambient). */
+.ambient { position: absolute; left: 0; right: 0; top: 0; height: 3px; z-index: 2; background: var(--amb, transparent);
+  box-shadow: 0 0 18px 2px var(--amb, transparent); opacity: var(--amb-o, 0); transition: background .6s, box-shadow .6s, opacity .6s; pointer-events: none; }
+
+/* ---------------------------------------------------------------- game (Compose screens) */
+.game { position: absolute; inset: 0; overflow: auto; --u: calc(var(--s, 0.6) * 1px); color: var(--text);
+  background: var(--motif, none), radial-gradient(circle at 10% 0, rgba(242, 153, 74, 0.10), transparent 60%), linear-gradient(var(--top, #0E1728), var(--bg-deep)); }
+.scr { min-height: 100%; display: flex; flex-direction: column; padding: calc(56 * var(--u)); }
+.center { align-items: center; justify-content: center; }
+.txt { line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
+.txt.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.txt.clamp { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.row { display: flex; align-items: center; }
+.col { display: flex; flex-direction: column; }
+.grow { flex: 1 1 0; min-width: 0; min-height: 0; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: calc(28 * var(--u)); }
+.card.hl { border: 3px solid var(--gold); }
+button.card { text-align: left; cursor: pointer; padding: 0; width: 100%; }
+button.card:hover { border-color: var(--gold); }
+button.card:focus-visible, .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+/* Pleos Basic button L (spec.md 8): height 100, r32, side padding 40; pressed = a darker tint, no scaling. Colors stay the theme's. */
+.btn { min-height: max(76px, calc(100 * var(--u))); border-radius: calc(32 * var(--u)); padding: 0 calc(40 * var(--u));
+  display: flex; align-items: center; justify-content: center; cursor: pointer; border: 0; min-width: 0; }
+.btn.primary { background: linear-gradient(90deg, var(--gold), var(--amber)); }
+.btn.secondary { background: var(--surface2); box-shadow: inset 0 0 0 1px var(--line); }
+.btn.secondary:hover { box-shadow: inset 0 0 0 2px var(--gold); }
+.btn:active { filter: brightness(0.9); }
+
+.pill { display: inline-flex; border-radius: 999px; border: 1px solid var(--pc); background: color-mix(in srgb, var(--pc) 16%, transparent);
+  padding: calc(6 * var(--u)) calc(18 * var(--u)); color: var(--pc); max-width: 100%; }
+.chip { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); border-radius: 999px; background: var(--surface2);
+  padding: calc(6 * var(--u)) calc(16 * var(--u)); }
+.flow { display: flex; flex-wrap: wrap; gap: calc(10 * var(--u)) calc(12 * var(--u)); align-items: center; }
+
+.breath { animation: breath 1.8s ease-in-out infinite alternate; transform-origin: left center; }
+.port .breath { transform-origin: center; }
+@keyframes breath { from { transform: scale(0.94); } to { transform: scale(1.04); } }
+.strip { height: calc(6 * var(--u)); width: calc(360 * var(--u)); border-radius: 99px; margin: calc(24 * var(--u)) 0;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--amber), #9B6BFF, transparent); }
+
+/* visuals: container units size the drawings like Compose BoxWithConstraints */
+.vis { container-type: size; position: relative; min-height: 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.port .pvis { flex: 1 0 auto; min-height: 210px; }
+.sq { width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); }
+.fill { width: 100%; height: 100%; display: block; }
+svg text { font-family: var(--font); }
+
+.seq-row { display: flex; align-items: center; justify-content: center; gap: calc(var(--chip) * 0.18); }
+.seq-row svg { width: var(--chip); height: var(--chip); flex: none; }
+.seq-row svg.cur { width: calc(var(--chip) * 1.15); height: calc(var(--chip) * 1.15); }
+
+.gauge { display: flex; flex-direction: column-reverse; justify-content: center; gap: 3cqh; width: calc(300 * var(--u)); height: 100%; flex: none; }
+.cell { flex: 0 1 calc(160 * var(--u)); min-height: 0; border-radius: calc(24 * var(--u)); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cell.on { border: 0; }
+.cell.off { background: var(--surface); border: 2px dashed var(--line); }
+.cell.tgt { border: 3px dashed var(--gold);
+  background: repeating-linear-gradient(-45deg, rgba(232, 185, 98, 0.18) 0 2px, transparent 2px 14px), var(--surface); }
+
+.cells { display: flex; justify-content: center; gap: calc(var(--cell) * 0.25); }
+.cells i { width: var(--cell); height: var(--cell); border-radius: calc(var(--cell) * 0.22); background: var(--surface); border: 1px solid var(--line); }
+.cells i.on { background: var(--gold); border-color: var(--gold); }
+
+.chain { display: flex; gap: calc(12 * var(--u)); width: 100%; align-items: stretch; }
+.chain > div { flex: 1 1 0; min-width: 0; border-radius: calc(18 * var(--u)); background: var(--surface2); border: 1px solid var(--line);
+  padding: calc(10 * var(--u)) calc(12 * var(--u)); display: flex; align-items: center; justify-content: center; }
+.chain > .done { background: var(--gold); border-color: var(--gold); }
+.chain > .cur { border: 3px solid var(--gold); }
+
+.pulse { animation: pulse .7s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: .45; } to { opacity: 1; } }
+
+.carmap.flash { animation: flash .8s ease-out; }
+@keyframes flash { from { filter: brightness(1.9) drop-shadow(0 0 10px var(--gold)); } to { filter: none; } }
+
+.stat { width: calc(300 * var(--u)); max-width: 42vw; padding: calc(24 * var(--u)) calc(12 * var(--u)); display: flex; flex-direction: column; align-items: center; }
+
+.solved { position: absolute; inset: 0; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; container-type: size; overflow: hidden; }
+.solved .ring { position: absolute; width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.solved .wave { transform-origin: 50px 50px; animation: wave 1.2s ease-out forwards; }
+@keyframes wave { from { transform: scale(1); opacity: .8; } to { transform: scale(2.4); opacity: 0; } }
+.solved .inner { position: relative; display: flex; flex-direction: column; align-items: center; max-width: min(50cqw, 50cqh); }
+
+.paused { min-height: 100%; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; padding: calc(56 * var(--u)); }
+.pbadge { border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; }
+
+/* ---------------------------------------------------------------- 마이 차고 + theme packs. Colors come from game.js SKINS (set on #frame);
+   밤하늘 sets nothing, so the screens above stay exactly as they were. Motifs are the theme's background art. */
+.frame[data-skin=FOREST_CAMP] .game { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120'%3E%3Cg fill='%239BD872' fill-opacity='.10'%3E%3Cpath d='M30 120L60 30L90 120Z'/%3E%3Cpath d='M100 120L140 0L180 120Z'/%3E%3Cpath d='M180 120L205 50L230 120Z'/%3E%3C/g%3E%3C/svg%3E") left bottom / auto 34% repeat-x; }
+.frame[data-skin=RACING] .game { --motif: repeating-linear-gradient(115deg, rgba(255, 122, 85, 0.07) 0 22px, transparent 22px 70px); }
+.frame[data-skin=UNDERSEA] .game { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cg fill='none' stroke='%234FD1E8' stroke-opacity='.16' stroke-width='3'%3E%3Ccircle cx='40' cy='50' r='16'/%3E%3Ccircle cx='70' cy='20' r='7'/%3E%3Ccircle cx='160' cy='140' r='22'/%3E%3Ccircle cx='190' cy='100' r='9'/%3E%3Ccircle cx='100' cy='190' r='6'/%3E%3C/g%3E%3C/svg%3E"); }
+.frame[data-skin=SPACE_STATION] .game { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23FFFFFF' fill-opacity='.35'%3E%3Ccircle cx='20' cy='30' r='1.6'/%3E%3Ccircle cx='120' cy='60' r='1.2'/%3E%3Ccircle cx='220' cy='20' r='2'/%3E%3Ccircle cx='70' cy='150' r='1.4'/%3E%3Ccircle cx='180' cy='200' r='1.8'/%3E%3Ccircle cx='240' cy='130' r='1.1'/%3E%3C/g%3E%3Ccircle cx='170' cy='110' r='14' fill='%23B0A4FF' fill-opacity='.14'/%3E%3Cellipse cx='170' cy='110' rx='26' ry='7' fill='none' stroke='%23B0A4FF' stroke-opacity='.2' stroke-width='2'/%3E%3C/svg%3E"); }
+.frame[data-skin=STRAWBERRY_MILK] .game { --motif: radial-gradient(circle, rgba(176, 46, 86, 0.08) 16%, transparent 17%) 0 0 / 64px 64px; }
+.frame[data-skin] .game.compact { --motif: none; }
+
+.carbtn { background: none; border: 0; padding: calc(8 * var(--u)); margin: calc(-8 * var(--u)); cursor: pointer; display: flex; flex-direction: column; align-items: inherit;
+  gap: calc(6 * var(--u)); min-height: max(76px, calc(76 * var(--u))); max-width: 100%; border-radius: calc(24 * var(--u)); }
+.port .carbtn { align-items: center; }
+.carside { display: block; position: relative; height: auto; transition: transform .15s; }
+.carside img, .carside svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+.carbtn:hover .carside { transform: translateY(-2px); }
+/* 3D hosts (car3d.js): the render PNG shows until WebGL draws, and stays when WebGL is not there */
+.car3d { position: relative; }
+.car3d { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.car3d > canvas, .pl-car > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; outline: none; }
+.car3d > canvas { cursor: grab; touch-action: none; }
+.car3d > canvas:active { cursor: grabbing; }
+.car3d.live > .carside, .pl-car.live > .carside { visibility: hidden; }
+.hero { min-height: 120px; }
+.carbtn { justify-content: center; }
+.gstage.deco { background: radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 70%); }
+.gpicks { overflow-y: auto; min-height: 0; padding: 4px 6px 4px 4px; margin: -4px; }
+/* Pleos Tabs (Box, Fitted): one container ~100 high, the selected tab a raised chip 8 in, 2x36 dividers between the others */
+.gtabs { display: flex; flex-wrap: wrap; gap: 0; padding: calc(8 * var(--u)); border-radius: calc(32 * var(--u)); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.gtab { position: relative; flex: 1 1 0; min-width: max(76px, calc(110 * var(--u))); min-height: max(76px, calc(84 * var(--u))); border-radius: calc(24 * var(--u));
+  background: transparent; border: 0; cursor: pointer; padding: 0 calc(14 * var(--u)); display: flex; align-items: center; justify-content: center; }
+.gtab + .gtab::before { content: ''; position: absolute; left: 0; top: 50%; width: 2px; height: calc(36 * var(--u)); transform: translateY(-50%); background: var(--line); }
+.gtab[aria-selected=true]::before, .gtab[aria-selected=true] + .gtab::before { display: none; }
+.gtab[aria-selected=true] { background: var(--gold); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16), 0 2px 2px rgba(0, 0, 0, 0.08); }
+.gtab:hover:not([aria-selected=true]) { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(124px, calc(210 * var(--u))), 1fr)); gap: calc(14 * var(--u)); }
+.opt { min-width: 0; min-height: max(76px, calc(150 * var(--u))); background: var(--surface); border: 2px solid var(--line); border-radius: calc(22 * var(--u));
+  padding: calc(14 * var(--u)) calc(10 * var(--u)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(8 * var(--u)); cursor: pointer; }
+.opt.on { border: 3px solid var(--gold); background: var(--surface2); }
+.opt.locked { cursor: default; border-style: dashed; }
+.opt.locked .opic { opacity: .4; filter: grayscale(.7); }
+.opic { display: flex; align-items: center; justify-content: center; }
+.sw { width: max(40px, calc(80 * var(--u))); height: max(40px, calc(80 * var(--u))); border-radius: 50%; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 12%; overflow: hidden; }
+.sw i { width: 26%; height: 26%; border-radius: 50%; }
+.wpic, .spic { width: max(40px, calc(84 * var(--u))); height: max(40px, calc(84 * var(--u))); display: block; }
+.mood { width: max(76px, calc(76 * var(--u))); height: max(76px, calc(76 * var(--u))); border-radius: 50%; background: var(--mc); border: 3px solid var(--line); cursor: pointer; padding: 0; }
+.mood[aria-pressed=true] { outline: 4px solid var(--text); outline-offset: 3px; }
+.opt:hover:not(.locked) { border-color: var(--gold); }
+.carbtn:focus-visible, .gtab:focus-visible, .opt:focus-visible, .mood:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+/* ---------------------------------------------------------------- virtual car panel (ui/DemoPanel.kt): right panel, folds to a rail; a bottom sheet under 900px */
+.panel { width: 312px; flex: none; background: var(--surface); border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.p-head { flex: none; display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 16px; border-bottom: 1px solid var(--line); }
+.p-ttl { flex: 1; min-width: 0; }
+.p-head h2 { margin: 0; font-size: 17px; }
+.p-head p { margin: 1px 0 0; font-size: 12.5px; color: var(--sub); line-height: 1.35; }
+.p-fold { flex: none; padding: 0 10px; }
+.p-fold span { display: none; }
+.p-fold i { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); margin: 0 3px 0 -1px; }
+.p-body { flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 12px 16px 20px; }
+.p-need { position: sticky; top: 0; z-index: 2; margin: 0 0 12px; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; line-height: 1.4; color: var(--on-gold); background: var(--gold); font-weight: 600; }
+.p-grid { display: grid; gap: 12px; }
+.p-item { display: flex; flex-direction: column; gap: 6px; min-width: 0; border-radius: 12px; }
+.p-item.need { outline: 2px solid var(--gold); outline-offset: 5px; background: color-mix(in srgb, var(--gold) 10%, transparent); }
+.panel-off .panel { width: 44px; }
+.panel-off .p-ttl, .panel-off .p-body { display: none; }
+.panel-off .p-head { flex: 1; padding: 8px 0; border-bottom: 0; align-items: flex-start; justify-content: center; }
+.panel-off .p-fold { writing-mode: vertical-rl; min-height: 0; padding: 14px 0; width: 32px; border-radius: 10px; }
+.panel-off .p-fold span { display: inline; }
+.panel-off .p-fold i { transform: rotate(135deg); margin: 6px 0 0; }
+.p-label { color: var(--sub); font-size: 15px; }
+.p-label b { color: var(--text); font-weight: 600; }
+.toggle { flex-direction: row; align-items: center; justify-content: space-between; min-height: 44px; font-size: 16px; cursor: pointer; }
+.toggle { gap: 10px; }
+.toggle > span { min-width: 0; }
+.toggle small { display: block; font-size: 13px; color: var(--faint); line-height: 1.35; margin-top: 2px; }
+.toggle b { font-weight: 600; }
+/* Pleos switch as on the device (capture 09): pill track 80x48, round knob 32, 8 in, at panel size */
+.toggle input { appearance: none; width: 56px; height: 34px; border-radius: 17px; background: var(--surface2); border: 1px solid var(--line); position: relative; cursor: pointer; flex: none; margin: 0; }
+.toggle input::after { content: ''; position: absolute; top: 5px; left: 5px; width: 22px; height: 22px; border-radius: 50%; background: var(--faint); transition: transform .15s; }
+.toggle input:checked { background: var(--amber); border-color: var(--amber); }
+.toggle input:checked::after { transform: translateX(22px); background: var(--on-gold); }
+.toggle input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+input[type=range] { width: 100%; accent-color: var(--amber); height: 28px; margin: 0; cursor: pointer; }
+.seg, .belts .row { display: flex; gap: 8px; }
+.belts { display: flex; flex-direction: column; gap: 6px; }
+.belts .row { gap: 6px; }
+.seg button, .belts button, .hold { flex: 1 1 0; min-width: 0; min-height: 48px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--line);
+  font-size: 16px; font-weight: 600; cursor: pointer; padding: 4px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.belts button { font-size: 14px; }
+.hold { min-height: 56px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.seg button[aria-pressed=true], .belts button[aria-pressed=true], .hold[aria-pressed=true] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+.seg button:hover, .belts button:hover, .hold:hover { border-color: var(--gold); }
+.seg button:focus-visible, .belts button:focus-visible, .hold:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ?clean=1: the car display alone, edge to edge (screen recording) */
+.clean .pv-top, .clean .pv-bar, .clean .foot, .clean .panel, .clean .pl-cap { display: none; }
+.clean .pl-fit { background: #000; }
+.clean .pl-shell { border-radius: 0; box-shadow: none; background: #000; }
+
+/* short windows: the scene chips give their row to the display */
+@media (max-height: 800px) and (min-width: 900px) { .pv-steps { display: none; } }
+@media (max-width: 1180px) {
+  .pv-field span { display: none; }
+  .pv-bar { grid-template-columns: minmax(0, 1fr); }
+}
+/* under 900px: display on top, scene bar, then the virtual car as a bottom sheet (open = fills the rest and scrolls) */
+@media (max-width: 899px) {
+  .stage { display: contents; }
+  .pv-top { order: 0; flex-wrap: wrap; padding: 8px 12px; }
+  .pv-brand { flex: 1; }
+  .pv-sp, #pv-full { display: none; }
+  .pv-field { order: 3; flex: 1 0 100%; }
+  .pv-top select { width: 100%; }
+  .frame { order: 1; flex: none; height: min(46dvh, calc((100vw - 28px) / var(--dev-ar, 1.82) + 46px)); }
+  .pv-bar { order: 2; padding: 8px 12px; gap: 6px; }
+  .pv-ctl { gap: 6px; }
+  .pv-ctl .pv-btn { flex: 1 1 0; padding: 0 6px; min-height: 44px; }
+  .pv-ctl .pv-btn.primary { flex: 1.5 1 0; }
+  #pv-prev span, #pv-next span { display: none; }
+  .pv-now { font-size: 13.5px; }
+  .pv-now span { -webkit-line-clamp: 3; }
+  .pv-steps { display: none; }
+  .panel { order: 3; width: auto; flex: 1 1 0; border-left: 0; border-top: 1px solid var(--line); }
+  .p-head { padding: 6px 12px; }
+  .p-head p { display: none; }
+  .p-fold { min-height: 44px; }
+  .p-fold span { display: inline; font-size: 0; }
+  .p-fold span::before { content: '접기'; font-size: 13px; }
+  .panel-off .p-fold span::before { content: '펼치기'; }
+  .p-fold i { transform: rotate(45deg); margin: -4px 2px 0 4px; }
+  .p-grid { grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .p-item.wide { grid-column: 1 / -1; }
+  .panel-off .frame { flex: 1 1 0; height: auto; }
+  .panel-off .panel { width: auto; flex: none; }
+  .panel-off .p-ttl { display: block; }
+  .panel-off .p-head { flex: none; padding: 6px 12px; align-items: center; justify-content: flex-start; }
+  .panel-off .p-fold { writing-mode: horizontal-tb; width: auto; padding: 0 10px; min-height: 44px; }
+  .panel-off .p-fold i { transform: rotate(-135deg); margin: 4px 2px 0 4px; }
+  .foot { order: 4; font-size: 10.5px; padding: 5px 12px; }
+}

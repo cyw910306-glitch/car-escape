@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카 이스케이프 근거와 구현 범위</title>
+<meta name="description" content="카 이스케이프에서 지금 동작하는 것, 에뮬레이터에서 검증한 것, 웹 모사인 것, 앞으로 할 것을 구분하고 주장마다 근거 위치를 적었습니다.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Asta+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="docs.css">
+<style>@page { size: A4; margin: 16mm 14mm 18mm; }</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./">카 이스케이프<small>제출 자료</small></a>
+  <nav aria-label="제출 자료">
+    <a href="./">자료 모음</a><a href="ux.html">화면설계서</a><a href="spec.html">개발 상세 사양</a><a href="evidence.html" aria-current="page">근거와 구현 범위</a><a href="credits.html">출처·라이선스</a><a href="../">시연 열기</a>
+  </nav>
+</div></header>
+
+<main class="doc wide">
+  <p class="eyebrow">근거와 구현 범위</p>
+  <h1>된 것과 아직 안 된 것을 나눠 적었습니다</h1>
+  <p class="lead">제출 자료의 문장마다 그것이 코드로 동작하는지, 에뮬레이터에서 직접 확인했는지, 웹에서 흉내 낸 것인지, 계획인지를 구분합니다. 실차에서는 아직 실행하지 않았습니다.</p>
+  <p class="meta">2026-11-15 기준 · 경로는 소스 저장소 기준입니다.</p>
+
+  <h2 id="scope"><span class="no">1</span>구현 범위 한눈에</h2>
+  <div class="tbl"><table class="fit">
+    <thead><tr>
+      <th style="width: 25%"><span class="tag ok">지금 동작하는 것</span></th>
+      <th style="width: 25%"><span class="tag emu">에뮬레이터에서 검증한 것</span></th>
+      <th style="width: 25%"><span class="tag web">웹 모사인 것</span></th>
+      <th style="width: 25%"><span class="tag plan">2차 발표 전까지 할 것</span></th>
+    </tr></thead>
+    <tbody><tr>
+      <td>
+        <ul>
+          <li>시즌 1 의 4개 화(15, 20, 30, 25분)</li>
+          <li>미션 12종과 매번 달라지는 판, 오늘의 금고</li>
+          <li>충전 시간 추정과 화 추천, 엔딩 4종</li>
+          <li>별점, 최고 기록, 배지, 가족 충전 일지</li>
+          <li>주행 차단 세 겹, 문 열림 정지</li>
+          <li>차에 없는 부품의 자동 대체, 안전 상한</li>
+          <li>마이 차고(도색, 휠, 스티커, 테마)</li>
+          <li>출발 금고(갈림길, 주차 암호, 다시 탔어요)</li>
+          <li>공식 앱 창 12종 레이아웃</li>
+          <li>무드등 연출과 원복, 음성 게임마스터</li>
+        </ul>
+        <p>Android 앱 코드와 자동 테스트로 확인.</p>
+      </td>
+      <td>
+        <ul>
+          <li>15분 편과 30분 편을 처음부터 엔딩까지 완주</li>
+          <li>운전석 창문, 독서등, 방향지시등, 핸들 열선, 시트 열선, 와이퍼(Low)</li>
+          <li>배터리와 충전 한도 반영, 남은 시간 추정, 80% 도달 엔딩</li>
+          <li>기어 D 에서 정지, P 에서 이어하기</li>
+          <li>무드등 색 쓰기(권한 포함)</li>
+          <li>출발 금고 전 과정: 갈림길, 저장, 문 잠금 뒤 귀환, 재실행 복구, 출발 시 삭제</li>
+          <li>충전구 열림에 다음 화 카드</li>
+        </ul>
+        <p>Pleos Connect Emulator v2.1.0, 17형, car 빌드, Virtual Console 조작. 2026-10-23, 10-25 기록.</p>
+      </td>
+      <td>
+        <ul>
+          <li>차량 신호 전부: 화면 옆 가상 차량 패널이 값을 만듦</li>
+          <li>차량 화면틀(상태바, 주행 정보, 하단 바): 에뮬레이터 실측 치수를 참고해 직접 그린 것</li>
+          <li>3D 차: 자체 제작 모델</li>
+          <li>음성: 미리 합성해 둔 파일</li>
+          <li>무드등: 앱 창의 빛 색으로 표현</li>
+          <li>12종 화면 전환: 주소 옵션과 선택 상자</li>
+        </ul>
+        <p>게임 규칙은 Android 와 같은 시나리오 41건으로 맞춰 둠. 출발 금고는 웹에 없음.</p>
+      </td>
+      <td>
+        <ul>
+          <li>조수석, 2열 창문과 쌍둥이, 릴레이 창문의 에뮬레이터 확인</li>
+          <li>속도만으로의 차단, 주행 모드, 창문 잠금 읽기 확인</li>
+          <li>와이퍼 High, Auto 상태값 확인</li>
+          <li>17형 외 폼팩터 프리셋에서 실행</li>
+          <li>Pleos TextToSpeech SDK 전환 검토</li>
+          <li>화면 낭독기, 색각 이상 점검</li>
+        </ul>
+        <p>실차 검증은 기회가 주어지면 진행하며 일정은 정해지지 않았습니다.</p>
+      </td>
+    </tr></tbody>
+  </table></div>
+
+  <h2 id="claims"><span class="no">2</span>주장별 근거 위치</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>주장</th><th>상태</th><th>근거 위치</th></tr></thead>
+    <tbody>
+      <tr><td>Pleos Vehicle SDK 2.3.2 로 실제 컴파일되고 실행된다</td><td><span class="tag emu">에뮬레이터 검증</span></td><td><code>gradle/libs.versions.toml</code>, <code>vehicle/build.gradle.kts</code>, <code>vehicle/PleosVehicleGateway.kt</code>. 빌드 산출물 <code>app/build/outputs/apk/</code> 의 car, release</td></tr>
+      <tr><td>차는 읽기만 하고, 쓰기는 무드등 한 가지다</td><td><span class="tag ok">구현</span></td><td><code>PleosVehicleGateway.kt</code> 안의 set 호출은 <code>setAmbientLightSwitch</code>, <code>setAmbientLightBrightnessColor</code>, <code>setAmbientLightBrightness</code> 세 가지뿐. 매니페스트의 CONTROL 권한도 <code>CONTROL_CAR_LIGHTS</code> 하나</td></tr>
+      <tr><td>게임은 정차 중에만 진행된다</td><td><span class="tag ok">테스트</span> <span class="tag emu">기어 D 검증</span></td><td><code>vehicle/DriveGuard.kt</code>, <code>game/Sim.kt</code> gated(), FlowTest 의 drivingPausesAndResumes, signalsUsedWhileDrivingDoNotCount. 매니페스트에 <code>distractionOptimized</code> 없음</td></tr>
+      <tr><td>남은 충전 시간에 맞는 화를 추천한다</td><td><span class="tag ok">테스트</span> <span class="tag emu">검증</span></td><td><code>game/ChargeClock.kt</code>, ChargeClockTest 4건, FlowTest 의 matchingPicksByEta. 실기: "약 34분 → 30분 에피소드 추천"</td></tr>
+      <tr><td>목표 충전량에 닿으면 엔딩이 열린다</td><td><span class="tag ok">테스트</span> <span class="tag emu">검증</span></td><td><code>EscapeGame.kt</code> finish(), FlowTest 의 bonusEndingWhenChargeFinishesFirst 등. 실기: SoC 80% 도달 엔딩</td></tr>
+      <tr><td>차에 없는 부품의 퍼즐은 다른 퍼즐로 바뀐다</td><td><span class="tag ok">테스트</span></td><td><code>game/Puzzles.kt</code> substitute(), SubstitutionTest, SubstituteV2Test, V3Test 의 childLockMovesSecondRowWindowsToTheFront</td></tr>
+      <tr><td>안전 상한(2열 창문 절반, 와이퍼 6회, 앞좌석 벨트만, 1화 깜빡이·와이퍼 제외)</td><td><span class="tag ok">테스트</span></td><td><code>Puzzles.kt</code> reroll, WIPE_CAP, FRONT. <code>Episodes.kt</code> avoid. V3Test 의 firstEpisodeNeverUsesSignalsOrWipers</td></tr>
+      <tr><td>공식 앱 창 12종에 맞춘다</td><td><span class="tag ok">스냅샷 564장</span> <span class="tag emu">17형만 실기</span></td><td><code>ui/Kit.kt</code> Scaled, <code>ui/src/test/java/com/carescape/ui/PleosScreens.kt</code>, <code>ui/src/test/snapshots/images/</code>, <code>docs/pleos/form-factor-official-dp.md</code></td></tr>
+      <tr><td>글자 대비 4.5:1 이상</td><td><span class="tag ok">자동 검사</span></td><td><code>ui/Kit.kt</code> Palette, <code>web/selftest.mjs</code> 의 테마 6종 대비 검사</td></tr>
+      <tr><td>인터넷, 카메라, 마이크, 위치 권한이 없다</td><td><span class="tag ok">확인</span></td><td><code>app/src/main/AndroidManifest.xml</code>, release 병합 매니페스트. 웹 체험판은 <code>web/vercel.json</code> 의 Permissions-Policy 로 카메라, 마이크, 위치를 끔</td></tr>
+      <tr><td>주차 메모는 기기에만 있고 출발하면 지워진다</td><td><span class="tag ok">테스트</span> <span class="tag emu">검증</span></td><td><code>game/Parking.kt</code>, <code>GameViewModel.savePark()</code>, ParkingTest 17건. 실기: 기어 D 뒤 저장값 없음</td></tr>
+      <tr><td>같은 날에는 모든 가족이 같은 판을 받는다</td><td><span class="tag ok">테스트</span></td><td><code>Puzzles.kt</code> roll(), RandomizeTest 6건</td></tr>
+      <tr><td>웹 체험판과 Android 앱의 게임 규칙이 같다</td><td><span class="tag ok">자동 검사</span></td><td><code>web/selftest.mjs</code> 41건(Kotlin 테스트와 같은 시나리오)</td></tr>
+      <tr><td>실차에서 동작한다</td><td><span class="tag plan">검증하지 않음</span></td><td>실차 실행 기록이 없습니다</td></tr>
+      <tr><td>아이오닉 9 에 Pleos Connect 가 탑재된다</td><td><span class="tag plan">가정</span></td><td>공식 근거를 찾지 못한 목표 플랫폼 가정(<code>docs/feasibility.md</code>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="today"><span class="no">3</span>2026-11-15 에 다시 확인한 것</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>확인</th><th>방법</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td>게임 로직 테스트</td><td><code>./gradlew :game:test --rerun-tasks</code></td><td>14개 클래스 90건 통과, 실패 0</td></tr>
+      <tr><td>UI 스냅샷 검증</td><td><code>./gradlew :ui:verifyPaparazziDebug</code></td><td>성공. 테스트 결과 파일은 2026-10-27 실행분(566건 통과)이며 그 뒤 입력이 바뀌지 않아 다시 돌지는 않음</td></tr>
+      <tr><td>웹 대조 검사</td><td><code>node web/selftest.mjs</code></td><td>41건 통과</td></tr>
+      <tr><td>권한</td><td>매니페스트와 release 병합 매니페스트의 권한 목록 확인</td><td>차량 권한 12개, SDK 연결 권한 1개, 라이브러리가 자동으로 넣는 앱 내부용 권한 1개뿐. 인터넷, 카메라, 마이크, 위치 없음</td></tr>
+      <tr><td>쓰기 호출</td><td><code>PleosVehicleGateway.kt</code> 에서 set 호출 검색</td><td>무드등 3종뿐</td></tr>
+      <tr><td>화면 캡처</td><td><code>submission/tools/capture_screens.py</code> 로 웹 체험판을 헤드리스 브라우저에서 실행</td><td>15분 편을 자동으로 완주하며 캡처. 콘솔 오류 0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">에뮬레이터 실기 검증은 오늘 다시 하지 않았습니다. 위 2번 표의 "에뮬레이터 검증"은 2026-10-23, 10-25 에 남긴 프로젝트 기록(<code>README.md</code> 의 실기 검증 결과 표)에 근거합니다.</p>
+
+  <h2 id="sdk"><span class="no">4</span>공모전 개발 범위와의 대응</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>공지 항목</th><th>카 이스케이프</th></tr></thead>
+    <tbody>
+      <tr><td>공개된 SDK 만 사용</td><td>Pleos Vehicle SDK 2.3.2 를 씁니다. 기어, 속도, 충전 상태, 목표 충전량, 주행 제한은 Android Automotive 표준 <code>android.car</code> API 로 읽습니다. Pleos 의 기어 API 가 사용 중단으로 표시되어 표준 속성을 쓰도록 안내하고 있고, 주행 제한은 Pleos 주행 규제 개발 가이드가 <code>CarUxRestrictionsManager</code> 를 쓰도록 안내합니다</td></tr>
+      <tr><td>LLM SDK 미제공</td><td>LLM 을 쓰지 않습니다. 이야기, 지시문, 힌트는 모두 앱에 들어 있는 문장입니다</td></tr>
+      <tr><td>차량 마이크 음성의 외부 인식 금지</td><td>마이크와 음성 인식을 쓰지 않습니다. 권한도 없습니다</td></tr>
+      <tr><td>Android API 28 이상, Gradle 8.0 이상, Kotlin</td><td>minSdk 28, Gradle 8.14.3, Kotlin 2.3.21</td></tr>
+      <tr><td>2차 발표는 에뮬레이터 구동 시연</td><td>car 빌드와 Virtual Console 로 15분, 30분 편을 완주한 기록이 있습니다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="notyet"><span class="no">5</span>확인하지 못해 계획이나 가정으로 둔 것</h2>
+  <ul>
+    <li>실차 실행 전부.</li>
+    <li>안전벨트와 탑승 좌석 신호: 에뮬레이터 Virtual Console 에 조작 카드가 없어 debug 빌드의 시연 패널로만 확인했습니다.</li>
+    <li>조수석, 2열 창문, 창문 잠금, 주행 모드: 코드는 있으나 에뮬레이터에서 조작해 보지 않았습니다.</li>
+    <li>속도만으로의 차단: 코드는 있으나 실기에서 속도만 바꿔 확인하지 않았습니다.</li>
+    <li>17형 이외 화면: 스냅샷 테스트와 웹 체험판으로만 확인했습니다.</li>
+    <li>Pleos TextToSpeech SDK: 쓰지 않았습니다. 지금 음성은 Android 표준 TextToSpeech 입니다.</li>
+  </ul>
+</main>
+<footer class="foot">Hyundai, IONIQ, Pleos 및 관련 명칭은 각 소유자의 상표입니다. 이 문서는 공모전 참가자가 만든 제출 자료이며 현대자동차·기아의 공식 문서가 아닙니다. · 팀 0won</footer>
+</body>
+</html>

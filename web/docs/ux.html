@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카 이스케이프 화면설계서</title>
+<meta name="description" content="카 이스케이프 화면설계서. 정보 구조, 화면별 설계, 주행·정차 상태 처리, 화면 규격 12종 대응, 토큰과 접근성.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Asta+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="docs.css">
+<style>@page { size: 1280px 720px; margin: 0; }</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./">카 이스케이프<small>제출 자료</small></a>
+  <nav aria-label="제출 자료">
+    <a href="./">자료 모음</a><a href="ux.html" aria-current="page">화면설계서</a><a href="spec.html">개발 상세 사양</a><a href="evidence.html">근거와 구현 범위</a><a href="credits.html">출처·라이선스</a><a href="../">시연 열기</a>
+  </nav>
+</div></header>
+
+<main class="deck">
+<div class="deck-intro">
+  <p class="eyebrow">화면설계서 · 18장</p>
+  <p class="lead">아래 18장은 16:9 지면입니다. 같은 내용의 PDF 는 <a href="./#downloads">자료 모음의 내려받기</a>에 있습니다. 화면 이미지는 모두 자체 앱을 캡처한 것이며 <code>submission/tools/capture_screens.py</code> 로 다시 뜰 수 있습니다.</p>
+</div>
+
+<!-- 01 -->
+<section class="slide"><div class="sl cover">
+  <div class="sl-body cols" style="--cols: 1fr 1.3fr; align-content: center; align-items: center">
+    <div class="sl-head">
+      <p class="eyebrow">카 이스케이프 · 보조 제출 자료</p>
+      <h2>화면설계서</h2>
+      <p>충전을 기다리는 동안 우리 차를 방탈출 게임으로 바꾸는 가족 협동 앱입니다. 이 문서는 정보 구조, 화면별 동작, 주행과 정차 상태 처리, 화면 규격 12종 대응, 토큰과 접근성 설계를 정리합니다.</p>
+      <p style="color: var(--ink3); font-size: .8em; margin-top: 1.6em">2026-11-15 · 팀 0won<br>기준 환경 Pleos Connect Emulator v2.1.0, Connect-S 17형 2560x1440 160dpi<br>화면 이미지는 모두 자체 앱 캡처입니다.</p>
+    </div>
+    <figure><div class="shot"><img src="img/frame-dark.jpg" alt="차량 화면 안에 실행된 카 이스케이프 타이틀. 왼쪽은 주행 정보 화면 모사, 오른쪽이 앱 창"></div>
+      <figcaption>웹 체험판의 차량 화면 모사 안에서 실행한 타이틀. 앱 창 크기는 공식 dp 값입니다.</figcaption></figure>
+  </div>
+  <div class="sl-foot"><span>카 이스케이프 화면설계서</span><span>01 / 18</span></div>
+</div></section>
+
+<!-- 02 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">설계 원칙</p><h2>차가 입력 장치이고, 화면은 지금 값과 목표를 보여 줍니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.25fr 1fr">
+    <div class="tbl-s"><table>
+      <thead><tr><th>원칙</th><th>화면에서 지키는 방법</th></tr></thead>
+      <tbody>
+        <tr><th>차가 입력 장치</th><td>퍼즐은 화면 버튼이 아니라 창문, 독서등, 방향지시등, 열선, 와이퍼, 안전벨트를 움직여 풉니다. 화면에는 지금 값, 목표, 움직일 부품 위치만 둡니다.</td></tr>
+        <tr><th>정차 중에만</th><td>기어 P, 속도 0.5km/h 이하, 주행 제한 없음일 때만 진행합니다. 하나라도 어긋나면 화면 전체를 정지 안내로 덮고 터치를 막습니다.</td></tr>
+        <tr><th>충전 시간에 맞춘 한 화</th><td>배터리 변화율로 남은 충전 시간을 추정해 그 안에 끝나는 화를 추천합니다. 목표 충전량에 닿는 순간이 엔딩입니다.</td></tr>
+        <tr><th>원래대로 출발</th><td>무드등은 끝나면 원래 값으로 되돌립니다. 창문, 열선, 독서등은 앱이 움직이지 않고, 시작 때와 달라진 곳만 엔딩에서 알려 줍니다.</td></tr>
+        <tr><th>차에 없는 부품은 건너뛰지 않고 바꿈</th><td>차가 제공하지 않는 입력의 퍼즐은 제공되는 입력의 퍼즐로 바꿉니다. 사용자에게 오류를 보여 주지 않습니다.</td></tr>
+      </tbody>
+    </table></div>
+    <div>
+      <h3>이 문서의 상태 표시</h3>
+      <div class="tbl-s"><table>
+        <tbody>
+          <tr><td><span class="tag ok">구현·테스트</span></td><td>코드에 있고 자동 테스트가 통과</td></tr>
+          <tr><td><span class="tag emu">에뮬레이터 검증</span></td><td>Pleos Connect Emulator v2.1.0 에서 직접 조작해 확인(프로젝트 기록 2026-10-23, 10-25)</td></tr>
+          <tr><td><span class="tag code">구현·실기 미검증</span></td><td>코드에 있으나 에뮬레이터에 조작 카드가 없거나 아직 확인하지 않음</td></tr>
+          <tr><td><span class="tag web">웹 모사</span></td><td>웹 체험판에서 가상 차량 패널로 흉내 낸 것</td></tr>
+          <tr><td><span class="tag plan">계획</span></td><td>아직 만들지 않음</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top: 1em; color: var(--ink2)">실차에서는 아직 실행하지 않았습니다. 검증 범위의 상세는 근거와 구현 범위 문서에 있습니다.</p>
+    </div>
+  </div>
+  <div class="sl-foot"><span>카 이스케이프 화면설계서</span><span>02 / 18</span></div>
+</div></section>
+
+<!-- 03 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">정보 구조</p><h2>화면은 10종, 한 화는 타이틀에서 엔딩까지 한 줄로 흐릅니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1fr 1.2fr">
+    <div class="tree"><ul>
+      <li><b>앱 진입</b>
+        <ul>
+          <li><span class="sid">S01</span>타이틀: 충전 링, 시작, 오늘의 금고, 기록과 배지, 충전 일지
+            <ul>
+              <li><span class="sid">S09</span>마이 차고: 도색, 휠, 스티커, 테마, 주행 모드별 테마</li>
+              <li><span class="sid">S10</span>출발 금고 카드: 갈림길, 주차 암호, 다시 탔어요</li>
+              <li>N화 준비 카드: 충전구가 열리면 다음 화를 제안</li>
+            </ul></li>
+          <li><span class="sid">S02</span>에피소드 매칭: 추천 1개와 시즌 1의 4개 화</li>
+          <li><span class="sid">S03</span>인트로: 지난 화 한 줄, 이번 화 이야기</li>
+          <li><span class="sid">S04</span>퍼즐(화마다 4~6개) 과 <span class="sid">S05</span>해제를 번갈아 진행</li>
+          <li><span class="sid">S06</span>엔딩: 충전 대기, 최종(별점, 새 기록, 원래대로 출발)</li>
+        </ul></li>
+      <li><b>어느 화면 위에나 겹치는 화면</b>
+        <ul>
+          <li><span class="sid">S07</span>주행 정지: 주행이 감지되면 전체를 덮음</li>
+          <li><span class="sid">S08</span>문 열림 정지: 인트로, 퍼즐, 해제 중 문이 열리면</li>
+          <li>시연 패널: debug 빌드 전용, release 에는 없음</li>
+        </ul></li>
+    </ul></div>
+    <div class="tbl-s"><table>
+      <thead><tr><th>ID</th><th>화면</th><th>상태값</th><th>구현 위치(<code>ui/</code>)</th><th>스냅샷</th></tr></thead>
+      <tbody>
+        <tr><td>S01</td><td>타이틀</td><td><code>TITLE</code></td><td><code>Screens.kt</code> TitleScreen</td><td class="num">7종</td></tr>
+        <tr><td>S02</td><td>에피소드 매칭</td><td><code>MATCHING</code></td><td>MatchingScreen</td><td class="num">2종</td></tr>
+        <tr><td>S03</td><td>인트로</td><td><code>INTRO</code></td><td>IntroScreen</td><td class="num">2종</td></tr>
+        <tr><td>S04</td><td>퍼즐</td><td><code>PUZZLE</code></td><td>PuzzleScreen, <code>Visuals.kt</code></td><td class="num">13종</td></tr>
+        <tr><td>S05</td><td>해제</td><td><code>SOLVED</code></td><td>SolvedScreen</td><td class="num">1종</td></tr>
+        <tr><td>S06</td><td>엔딩</td><td><code>ENDING</code></td><td>EndingScreen</td><td class="num">5종</td></tr>
+        <tr><td>S07</td><td>주행 정지</td><td><code>PAUSED_DRIVING</code></td><td>PausedDrivingOverlay</td><td class="num">1종</td></tr>
+        <tr><td>S08</td><td>문 열림 정지</td><td><code>PAUSED_DOOR</code></td><td>DoorPauseScreen</td><td class="num">2종</td></tr>
+        <tr><td>S09</td><td>마이 차고</td><td>타이틀 위</td><td><code>Garage.kt</code> GarageScreen</td><td class="num">7종</td></tr>
+        <tr><td>S10</td><td>출발 금고</td><td>타이틀 위</td><td><code>Parking.kt</code></td><td class="num">6종</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="sl-foot"><span>스냅샷 = Paparazzi 화면 상태 수. 상태마다 공식 앱 창 12종으로 찍습니다(46개 상태 x 12종 = 552장, 크기 견본 12장 포함 564장).</span><span>03 / 18</span></div>
+</div></section>
+
+<!-- 04 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면 흐름도</p><h2>상태는 8개, 전이 조건은 사용자 행동과 차량 신호 두 가지입니다</h2></div>
+  <div class="sl-body">
+    <div class="flow" aria-label="주 흐름">
+      <div class="node"><b>S01 타이틀</b><span>TITLE</span></div><span class="arrow">→</span>
+      <div class="node"><b>S02 매칭</b><span>MATCHING</span></div><span class="arrow">→</span>
+      <div class="node"><b>S03 인트로</b><span>INTRO</span></div><span class="arrow">→</span>
+      <div class="node hot"><b>S04 퍼즐</b><span>PUZZLE</span></div><span class="arrow">⇄</span>
+      <div class="node"><b>S05 해제</b><span>SOLVED</span></div><span class="arrow">→</span>
+      <div class="node"><b>S06 엔딩 대기</b><span>ENDING, 충전 대기</span></div><span class="arrow">→</span>
+      <div class="node"><b>S06 엔딩</b><span>ENDING, 최종</span></div>
+    </div>
+    <div class="tbl-s"><table>
+      <thead><tr><th>전이</th><th>조건</th><th>종류</th></tr></thead>
+      <tbody>
+        <tr><td>타이틀 → 매칭</td><td>시작 또는 오늘의 금고를 누름</td><td>행동</td></tr>
+        <tr><td>매칭 → 인트로</td><td>에피소드 카드를 고름. N화 준비 카드의 시작도 같은 곳으로 들어감</td><td>행동</td></tr>
+        <tr><td>인트로 → 퍼즐</td><td>계속을 누르거나 5초가 지남(지난 화 한 줄이 있으면 4초 더)</td><td>행동, 시간</td></tr>
+        <tr><td>퍼즐 → 해제</td><td>차량 입력이 판정을 통과함. 건너뛰기를 누르거나 와이퍼 상한(6회)에 닿아도 다음으로 넘어감</td><td>차량 신호, 행동</td></tr>
+        <tr><td>해제 → 다음 퍼즐 또는 엔딩</td><td>3초 뒤 자동. 마지막 퍼즐이었고 아직 충전 중이면 엔딩 대기</td><td>시간</td></tr>
+        <tr><td>엔딩 대기 → 엔딩</td><td>배터리가 목표 충전량 이상이 되거나 충전이 멈춤</td><td>차량 신호</td></tr>
+        <tr><td>인트로·퍼즐·해제 → 엔딩</td><td>퍼즐이 남았는데 충전이 먼저 목표에 닿음. 남은 퍼즐을 알려 주는 보너스 엔딩</td><td>차량 신호</td></tr>
+        <tr><td>어느 상태 → 주행 정지 → 직전 상태</td><td>기어가 P 가 아니거나 속도 0.5km/h 초과 또는 주행 제한. P 로 돌아오면 직전 상태로 복귀</td><td>차량 신호</td></tr>
+        <tr><td>인트로·퍼즐·해제 → 문 열림 정지 → 직전 상태</td><td>문이 열림. 모두 닫힌 뒤 이어서 하기를 눌러야 복귀</td><td>차량 신호, 행동</td></tr>
+        <tr><td>엔딩 → 타이틀</td><td>처음으로를 누름</td><td>행동</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="sl-foot"><span>근거: <code>core/Contract.kt</code> Phase, <code>game/EscapeGame.kt</code> onVehicle</span><span>04 / 18</span></div>
+</div></section>
+
+<!-- 05 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S01</span>타이틀: 지금 충전 상태에서 한 번에 시작합니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <div class="pair">
+      <figure><div class="shot"><img src="img/title.jpg" alt="타이틀 화면. 앱 이름, 우리 차 그림, 충전 링 42%에서 목표 80%, 시작과 오늘의 금고 버튼"></div><figcaption>첫 실행</figcaption></figure>
+      <figure><div class="shot"><img src="img/title-records.jpg" alt="한 화를 끝낸 뒤의 타이틀. 최고 기록과 배지, 충전 일지가 보임"></div><figcaption>한 화를 끝낸 뒤: 기록, 배지, 충전 일지</figcaption></figure>
+    </div>
+    <dl class="kv">
+      <dt>목적</dt><dd>충전 상태를 확인하고 바로 시작. 지난 기록으로 다시 올 이유를 보여 줌</dd>
+      <dt>구성 요소</dt><dd>앱 이름, 우리 차 그림(누르면 마이 차고), 충전 링(현재 → 목표, 예상 남은 시간), 시작, 오늘의 금고, 최고 기록과 배지, 가족 충전 일지(삭제 버튼 포함)</dd>
+      <dt>행동 → 다음</dt><dd>시작 → S02. 오늘의 금고 → S02(날짜를 시드로 같은 문제). 차 그림 → S09. 일지 지우기는 한 번 더 확인</dd>
+      <dt>차량 신호</dt><dd>배터리 SoC, 목표 충전량, 충전 중 여부. 충전구가 닫힘에서 열림으로 바뀌면 N화 준비 카드. 주행 뒤 P 에 두면 갈림길 카드(S10)</dd>
+      <dt>예외·복구</dt><dd>SoC 를 아직 못 읽으면 남은 시간은 "계산 중". 주행 모드를 모르면 고정 테마. 목표 충전량을 차가 주지 않으면 기본 80%</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> SoC 40, 한도 80 이 즉시 반영</dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>카 이스케이프 화면설계서</span><span>05 / 18</span></div>
+</div></section>
+
+<!-- 06 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S02</span>에피소드 매칭: 남은 충전 시간 안에 끝나는 화를 추천합니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <figure><div class="shot"><img src="img/matching.jpg" alt="에피소드 매칭 화면. 15분, 20분, 30분, 25분 네 개의 화 카드와 추천 표시"></div><figcaption>오늘의 금고로 들어온 매칭 화면. 카드마다 그 화에서 쓰는 차 부품 아이콘과 퍼즐 수를 보여 줍니다.</figcaption></figure>
+    <dl class="kv">
+      <dt>목적</dt><dd>충전이 끝나기 전에 마칠 수 있는 화를 고르게 함</dd>
+      <dt>구성 요소</dt><dd>추천 문구(남은 충전 시간 → N분 에피소드), 화 카드 4개(시간, N화, 제목, 소개, 쓰는 부품 아이콘, 퍼즐 수, 최고 기록), 오늘의 금고 표시</dd>
+      <dt>행동 → 다음</dt><dd>카드 선택 → S03. 추천이 아닌 화도 고를 수 있음</dd>
+      <dt>차량 신호</dt><dd>SoC 를 5초 간격으로 모아 최근 10분 구간의 변화율(최소제곱)로 남은 시간을 추정. 차가 지원하는 입력 목록으로 퍼즐을 미리 바꿈</dd>
+      <dt>추천 규칙</dt><dd>남은 시간 안에 드는 가장 긴 화. 드는 화가 없거나 아직 모르면 가장 짧은 화(15분)</dd>
+      <dt>예외·복구</dt><dd>표본이 3개 미만이거나 90초 미만이면 "계산 중". 5분 동안 0.5% 미만으로 움직이면 멈춘 것으로 보고 추정하지 않음</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> SoC 40 → 42 뒤 "약 34분 → 30분 에피소드 추천"</dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>근거: <code>game/ChargeClock.kt</code>, <code>EscapeGame.recommend()</code>, <code>Episodes.kt</code></span><span>06 / 18</span></div>
+</div></section>
+
+<!-- 07 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S03</span>인트로와 <span class="sid">S05</span>해제: 이야기는 짧게, 넘어가는 것은 자동으로</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <div class="pair">
+      <figure><div class="shot"><img src="img/intro.jpg" alt="인트로 화면. 에피소드 제목과 이야기 한 문단, 계속 버튼"></div><figcaption>S03 인트로</figcaption></figure>
+      <figure><div class="shot"><img src="img/solved.jpg" alt="해제 화면. 열린 자물쇠 그림과 보상 문장"></div><figcaption>S05 해제</figcaption></figure>
+    </div>
+    <dl class="kv">
+      <dt>목적</dt><dd>S03 은 이번 화의 이야기를 들려주고, S05 는 풀었다는 것을 확실히 알려 줌</dd>
+      <dt>구성 요소</dt><dd>S03: N화 표시, 제목, 지난 화 한 줄(앞 화를 끝냈을 때만), 이야기, 계속. S05: 열린 자물쇠, 보상 문장</dd>
+      <dt>행동 → 다음</dt><dd>S03: 계속 또는 5초 뒤 S04. S05: 3초 뒤 다음 S04 또는 S06. S05 에는 누를 것이 없음</dd>
+      <dt>차량 출력</dt><dd>S03: 그 화의 색으로 무드등. S05: 초록 무드등, 정답 효과음. 이야기와 보상 문장은 음성으로도 읽음</dd>
+      <dt>예외·복구</dt><dd>무드등 쓰기가 실패해도 진행(화면 색만 바뀜). 문이 열리면 음성과 시간을 멈추고 S08</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> 무드등 앰버 적용 확인</dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>근거: <code>EscapeGame.kt</code> INTRO_MS 5초, RECAP_MS 4초, SOLVED_MS 3초</span><span>07 / 18</span></div>
+</div></section>
+
+<!-- 08 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S04</span>퍼즐: 왼쪽은 지금 값, 오른쪽은 움직일 부품과 할 일</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <div class="pair">
+      <figure><div class="shot"><img src="img/puzzle-dial.jpg" alt="창문 금고 퍼즐. 왼쪽 금고 다이얼에 창문 0%와 목표 50%, 오른쪽에 운전석 창문 위치 그림과 지시문, 힌트와 건너뛰기"></div><figcaption>창문 금고: 창문 높이가 다이얼 바늘</figcaption></figure>
+      <figure><div class="shot"><img src="img/puzzle-hint.jpg" alt="힌트를 한 번 누른 퍼즐 화면. 지시문 아래에 힌트 문장이 보임"></div><figcaption>힌트를 누른 뒤</figcaption></figure>
+    </div>
+    <dl class="kv">
+      <dt>목적</dt><dd>움직일 차 부품, 지금 값, 목표를 한눈에 보여 줌</dd>
+      <dt>구성 요소</dt><dd>진행(1/4 와 점), 퍼즐 이름, 충전 바(현재 → 목표, 남은 시간), 퍼즐 그림, 부품 위치 그림, 이야기 한 줄, 지시문, 힌트, 건너뛰기, 번개 금고일 때 남은 시간 고리</dd>
+      <dt>행동 → 다음</dt><dd>차 부품 조작이 판정을 통과하면 S05. 힌트는 퍼즐마다 3단계까지. 건너뛰기 → S05(별점에서 감점)</dd>
+      <dt>차량 신호</dt><dd>퍼즐이 요구하는 입력 1~3종. 퍼즐을 시작한 순간의 상태가 기준선이라 이미 켜져 있던 것은 세지 않음</dd>
+      <dt>예외·복구</dt><dd>시작할 때 이미 정답 상태면 "한 번 움직였다가 다시 맞춰 보세요". 순서를 틀리면 오답 효과음 뒤 처음부터. 번개 시간이 지나도 퍼즐은 계속</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> 창문 50%, 1/3 지점 해제</dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>근거: <code>game/Puzzles.kt</code> PuzzleRun, <code>ui/Screens.kt</code> PuzzleScreen</span><span>08 / 18</span></div>
+</div></section>
+
+<!-- 09 -->
+<section class="slide"><div class="sl dense">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S04</span>퍼즐 그림 9종과 차량 입력</h2></div>
+  <div class="sl-body cols" style="--cols: 3.4fr 1fr">
+    <div class="tbl-s"><table>
+      <thead><tr><th>그림</th><th>미션</th><th>차량 입력</th><th>통과 조건</th><th>상태</th></tr></thead>
+      <tbody>
+        <tr><td>다이얼</td><td>창문 금고</td><td>창문 위치(운전석, 조수석, 2열)</td><td>목표 30·50·70% 의 ±10% 안에서 2초 유지</td><td><span class="tag emu">운전석 검증</span></td></tr>
+        <tr><td>쌍둥이</td><td>쌍둥이 창문</td><td>운전석과 조수석 창문</td><td>둘 다 20~80% 안, 서로 10% 이내, 2초 유지</td><td><span class="tag code">실기 미검증</span></td></tr>
+        <tr><td>모스 램프</td><td>독서등 등대</td><td>독서등 켜짐</td><td>0.6초 미만은 짧게, 이상은 길게. 2.5초 쉬면 처음부터</td><td><span class="tag emu">검증</span></td></tr>
+        <tr><td>화살표 순서</td><td>깜빡이 암호</td><td>방향지시등</td><td>왼쪽·오른쪽 순서가 일치. 틀리면 처음부터</td><td><span class="tag emu">검증</span></td></tr>
+        <tr><td>기억</td><td>기억 금고</td><td>방향지시등</td><td>순서를 8초 + 개수 x 0.7초 보여 준 뒤 숨김. 보여 주는 동안의 입력은 세지 않음</td><td><span class="tag ok">테스트</span></td></tr>
+        <tr><td>단계 게이지</td><td>따뜻한 핸들·의자</td><td>핸들 열선, 운전석 시트 열선</td><td>목표 단계에서 1.5초 유지. 목표는 차가 알려 준 최대 단계 이내</td><td><span class="tag emu">검증</span></td></tr>
+        <tr><td>수수께끼</td><td>수수께끼 금고</td><td>창문, 열선, 와이퍼 중 하나</td><td>덧셈·뺄셈의 답만큼 조작. 창문은 10칸 중 그 칸만 인정</td><td><span class="tag ok">테스트</span></td></tr>
+        <tr><td>연쇄 칩</td><td>연쇄 금고, 릴레이 창문</td><td>서로 다른 부품 2~3단계</td><td>정해진 순서로 한 단계씩. 와이퍼 단계는 넣지 않음</td><td><span class="tag ok">테스트</span></td></tr>
+        <tr><td>좌석 지도</td><td>찰칵</td><td>앞좌석 안전벨트</td><td>풀었다가 다시 채운 것만 인정. 릴레이는 운전석에서 조수석 순서</td><td><span class="tag code">실기 미검증</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="pair" style="grid-template-columns: 1fr">
+      <figure><div class="shot"><img src="img/puzzle-morse.jpg" alt="독서등 등대 퍼즐. 짧게와 길게 신호를 보여 주는 램프 그림"></div><figcaption>모스 램프: 독서등 등대</figcaption></figure>
+      <figure><div class="shot"><img src="img/puzzle-level.jpg" alt="열선 퍼즐. 목표 단계까지의 게이지"></div><figcaption>단계 게이지: 열선</figcaption></figure>
+    </div>
+  </div>
+  <div class="sl-foot"><span>번개 금고는 그림이 아니라 위 퍼즐에 붙는 시간 고리입니다. 찰칵은 에뮬레이터에 벨트 조작 카드가 없어 debug 빌드 시연 패널로만 확인했고, 조수석과 2열 창문은 아직 에뮬레이터에서 확인하지 않았습니다.</span><span>09 / 18</span></div>
+</div></section>
+
+<!-- 10 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S06</span>엔딩: 목표 충전량에 닿는 순간 열리고, 원래대로 출발로 끝납니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <div class="pair">
+      <figure><div class="shot"><img src="img/ending-waiting.jpg" alt="엔딩 대기 화면. 모든 퍼즐을 풀었고 충전이 끝나면 엔딩이 열린다는 안내"></div><figcaption>충전 대기: 퍼즐을 먼저 다 푼 경우</figcaption></figure>
+      <figure><div class="shot"><img src="img/ending.jpg" alt="최종 엔딩 화면. 별 두 개, 충전 완료 문장, 원래대로 출발 목록, 걸린 시간과 새 배지"></div><figcaption>최종 엔딩</figcaption></figure>
+    </div>
+    <dl class="kv">
+      <dt>목적</dt><dd>게임의 끝을 충전의 끝에 맞추고, 차를 시작 때 상태로 돌려 놓게 안내</dd>
+      <dt>구성 요소</dt><dd>별 1~3개, 엔딩 문장(충전량, 주행 가능 거리, 다음 화 예고), 원래대로 출발 목록, 걸린 시간, 최고 기록, 새 배지, 마이 차고에 새로 열린 것, 처음으로</dd>
+      <dt>행동 → 다음</dt><dd>처음으로 → S01. 목록의 부품을 사용자가 직접 돌려 놓으면 목록에서 사라지고, 다 사라지면 "출발 준비 완료"</dd>
+      <dt>차량 신호</dt><dd>SoC, 목표 충전량, 충전 중 여부, 주행 가능 거리. 시작 때와 창문이 5% 넘게 다르거나 열선, 독서등, 와이퍼가 달라졌는지 비교</dd>
+      <dt>별점</dt><dd>힌트 0, 건너뛰기 0 이면 3개. 건너뛰기 0 이고 힌트가 퍼즐 수 이하면 2개. 그 밖은 1개</dd>
+      <dt>예외·복구</dt><dd>충전이 먼저 끝나면 남은 퍼즐을 알려 주는 보너스 엔딩. 충전이 멈추면 "충전이 멈췄어요" 엔딩. 낮고 넓은 창에서는 내용이 스크롤되고 처음으로는 항상 화면에 남음</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> SoC 80% 도달 엔딩</dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>캡처의 걸린 시간이 짧은 것은 캡처 스크립트가 퍼즐을 자동으로 풀었기 때문입니다.</span><span>10 / 18</span></div>
+</div></section>
+
+<!-- 11 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">주행·정차 상태별 동작</p><h2><span class="sid">S07</span>주행 정지: 게임은 정차 중에만, 판단은 세 겹으로 합니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1fr 1.25fr">
+    <div class="pair" style="grid-template-columns: 1fr">
+      <figure><div class="shot"><img src="img/frame-driving.jpg" alt="기어 D 에서의 차량 화면. 앱 창 전체가 주행 정지 안내로 덮임"></div><figcaption>기어 D: 앱 창 전체를 불투명한 정지 안내로 덮습니다(웹 모사).</figcaption></figure>
+    </div>
+    <div>
+      <div class="tbl-s"><table>
+        <thead><tr><th>상황</th><th>앱 동작</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>차단 조건</td><td>주행 제한(<code>CarUxRestrictions</code>) 이거나 기어가 P 가 아니거나 속도가 0.5km/h 초과</td><td><span class="tag ok">테스트</span></td></tr>
+          <tr><td>차단 즉시</td><td>음성 중단, 화면 전체를 정지 안내로 덮고 터치 차단, 무드등 원복, 경과 시간 정지</td><td><span class="tag emu">기어 D 검증</span></td></tr>
+          <tr><td>P 복귀</td><td>직전 화면으로 돌아가고 퍼즐 기준선을 새로 잡음. 주행 중에 켠 방향지시등은 정답으로 세지 않음</td><td><span class="tag emu">검증</span></td></tr>
+          <tr><td>기어를 모를 때</td><td>막힌 것으로 봄. 기어를 끝내 알려 주지 않는 차에서는 정지 화면에 머묾</td><td><span class="tag ok">테스트</span></td></tr>
+          <tr><td>주행 중 충전기 분리</td><td>엔딩을 띄우지 않고 정지만 유지. P 로 돌아온 뒤 60초 안에 다시 꽂으면 이어서 진행</td><td><span class="tag ok">테스트</span></td></tr>
+          <tr><td>시스템 쪽 차단</td><td><code>distractionOptimized</code> 를 선언하지 않아 주행 중에는 시스템이 앱을 가림</td><td><span class="tag emu">검증</span></td></tr>
+          <tr><td>앱이 뒤로 감</td><td>진행, 소리, 무드등을 모두 멈추고 되돌림(<code>onStop</code>)</td><td><span class="tag ok">구현</span></td></tr>
+          <tr><td>속도만으로 차단</td><td>코드에 있으나 에뮬레이터에서 속도만 바꿔 확인하지는 않음</td><td><span class="tag code">실기 미검증</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="sl-foot"><span>근거: <code>vehicle/DriveGuard.kt</code>, <code>game/Sim.kt</code> gated(), <code>app/AndroidManifest.xml</code>, <code>docs/pleos/driving-restriction-development-guide.txt</code></span><span>11 / 18</span></div>
+</div></section>
+
+<!-- 12 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">주행·정차 상태별 동작</p><h2><span class="sid">S08</span>문 열림 정지: 문은 "잠깐 기다려"만 뜻합니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.12fr 1fr">
+    <div class="pair">
+      <figure><div class="shot"><img src="img/door-open.jpg" alt="문 열림 정지 화면. 문이 열려 잠시 멈췄다는 안내"></div><figcaption>문이 열려 있는 동안</figcaption></figure>
+      <figure><div class="shot"><img src="img/door-ask.jpg" alt="문이 모두 닫힌 뒤의 화면. 이어서 할까요 질문과 이어서 하기 버튼"></div><figcaption>모두 닫힌 뒤: "이어서 할까요?"</figcaption></figure>
+    </div>
+    <dl class="kv">
+      <dt>목적</dt><dd>타고 내리는 동안 음성과 번개 시간이 흐르지 않게 함</dd>
+      <dt>진입</dt><dd>인트로, 퍼즐, 해제 중 실내 문 가운데 하나라도 열림. 타이틀과 엔딩에서는 멈추지 않음</dd>
+      <dt>구성 요소</dt><dd>문 그림, 안내 문장, 문이 모두 닫힌 뒤에만 나타나는 이어서 하기</dd>
+      <dt>행동 → 다음</dt><dd>이어서 하기 → 멈췄던 화면. 퍼즐이면 기준선을 새로 잡아, 내리면서 건드린 스위치는 세지 않음</dd>
+      <dt>차량 신호</dt><dd>문 위치(<code>Door.registerDoorPosition</code>). 누가 내렸는지, 어디 앉았는지는 추정하지 않음</dd>
+      <dt>예외·복구</dt><dd>문 신호가 없는 차에서는 이 화면이 뜨지 않고 게임은 그대로 진행. 닫힌 직후 "이어서 할까요?" 를 음성으로 한 번 물음</dd>
+      <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">문 열림·닫힘 신호 수신 검증</span></dd>
+    </dl>
+  </div>
+  <div class="sl-foot"><span>근거: <code>EscapeGame.kt</code> PAUSED_DOOR, resumeAfterDoor()</span><span>12 / 18</span></div>
+</div></section>
+
+<!-- 13 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면별 설계</p><h2><span class="sid">S09</span>마이 차고와 <span class="sid">S10</span>출발 금고</h2></div>
+  <div class="sl-body cols" style="--cols: 1fr 1fr">
+    <div>
+      <div class="pair">
+        <figure><div class="shot"><img src="img/garage.jpg" alt="마이 차고 화면. 우리 차 그림과 도색 선택"></div><figcaption>S09 도색</figcaption></figure>
+        <figure><div class="shot"><img src="img/garage-theme.jpg" alt="마이 차고 테마 탭. 앱 전체 색을 바꾸는 테마 묶음"></div><figcaption>S09 테마</figcaption></figure>
+      </div>
+      <dl class="kv" style="margin-top: .8em">
+        <dt>목적</dt><dd>모은 별과 배지로 우리 차와 앱 테마를 꾸밈</dd>
+        <dt>구성 요소</dt><dd>도색 8, 휠 4, 미션 배지 스티커 12(붙이는 자리 3), 테마 6, 주행 모드별 테마와 무드등 미리 켜 보기</dd>
+        <dt>차량 신호</dt><dd>주행 모드(읽기만). 무드등 미리 보기는 P 에서만 켜지고 차고를 나가면 원복</dd>
+        <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag code">주행 모드 실기 미검증</span></dd>
+      </dl>
+    </div>
+    <div>
+      <div class="pair">
+        <figure><div class="shot"><img src="img/and-park-fork.jpg" alt="갈림길 카드. 주차했어요, 어떻게 할까요. 차에서 기다려요와 다녀올게요"></div><figcaption>S10 갈림길(Android 스냅샷)</figcaption></figure>
+        <figure><div class="shot"><img src="img/and-return-ask.jpg" alt="다시 탔어요 카드. 주차 암호를 누가 기억하는지 묻고 정답 보기 버튼"></div><figcaption>S10 다시 탔어요(Android 스냅샷)</figcaption></figure>
+      </div>
+      <dl class="kv" style="margin-top: .8em">
+        <dt>목적</dt><dd>차를 두고 다녀올 때 보호자가 기둥 번호를 남기고, 돌아와서 가족이 맞혀 봄</dd>
+        <dt>흐름</dt><dd>주행 뒤 P → 갈림길 → 다녀올게요 → 층·구역·번호 입력 → 확인 → 저장. 문 잠금 뒤 다시 타면 "다시 탔어요" → 정답 보기(떠난 사이 충전량과 주행 가능 거리)</dd>
+        <dt>차량 신호</dt><dd>기어, 문 잠금, 문 위치, SoC, 주행 가능 거리. 위치 좌표는 쓰지 않고 사람이 누른 값만 저장</dd>
+        <dt>예외·복구</dt><dd>앱을 다시 켜도 카드 복구. 출발(D 또는 주행 제한)하면 암호 삭제. 문 잠금 신호가 없는 차는 타이틀의 보관 중 칩으로 직접 엶</dd>
+        <dt>상태</dt><dd><span class="tag ok">구현·테스트</span> <span class="tag emu">에뮬레이터 검증</span> <span class="tag plan">웹 체험판에는 없음</span></dd>
+      </dl>
+    </div>
+  </div>
+  <div class="sl-foot"><span>근거: <code>ui/Garage.kt</code>, <code>game/Customization.kt</code>, <code>ui/Parking.kt</code>, <code>game/Parking.kt</code></span><span>13 / 18</span></div>
+</div></section>
+
+<!-- 14 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면 규격 12종 대응</p><h2>공식 앱 창 크기 12종에 같은 규칙 세 가지로 맞춥니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.15fr 1fr">
+    <div>
+      <div class="tbl-s"><table>
+        <thead><tr><th>디스플레이</th><th>dpi</th><th>분할 창(1:1), dp</th><th>단독 창, dp</th><th>레이아웃</th></tr></thead>
+        <tbody>
+          <tr><td>Connect-S 17형 2560x1440</td><td class="num">160</td><td class="num">840 x 1184</td><td class="num">1700 x 1184</td><td>기준</td></tr>
+          <tr><td>Connect-S 14.6형 2048x1152</td><td class="num">200</td><td class="num">672 x 948</td><td class="num">1360 x 948</td><td>축소</td></tr>
+          <tr><td>Connect-S 12.9형 1920x1080</td><td class="num">160</td><td class="num">628 x 855</td><td class="num">1274 x 855</td><td>축소</td></tr>
+          <tr><td>Connect-WS 24.6형 3840x850</td><td class="num">160</td><td class="num">800 x 810</td><td class="num">1640 x 810</td><td>단독은 컴팩트</td></tr>
+          <tr><td>Connect-WE 24.6형 3840x1440</td><td class="num">160</td><td class="num">800 x 1400</td><td class="num">1640 x 1400</td><td>축소</td></tr>
+          <tr><td>Connect-WF 18.7형 3072x816</td><td class="num">200</td><td class="num">648 x 800</td><td class="num">1256 x 800</td><td>축소</td></tr>
+        </tbody>
+      </table></div>
+      <p style="color: var(--ink3); font-size: .74em; margin-top: .6em">값의 출처: Pleos Connect Emulator v2.1.0 내장 폼팩터 콘솔의 "테스트 화면 크기" 표시값을 2026-10-23 에 읽음(<code>docs/pleos/form-factor-official-dp.md</code>). 17형 단독 창의 실제 실행 크기는 1682 x 1210 으로 측정됐습니다(창 바 포함 여부 차이).</p>
+    </div>
+    <div>
+      <div class="tbl-s"><table>
+        <thead><tr><th>규칙</th><th>내용</th></tr></thead>
+        <tbody>
+          <tr><th>방향</th><td>폭이 높이보다 크면 가로: 퍼즐 그림 왼쪽, 지시문 오른쪽. 아니면 세로: 위아래로 쌓음</td></tr>
+          <tr><th>배율</th><td>17형 창(가로 1680, 세로 1184dp)을 1로 두고 폭 비율과 높이 비율 중 작은 값. 0.34~1.2 로 제한</td></tr>
+          <tr><th>컴팩트</th><td>폭이 높이의 1.8배를 넘는 가로 창은 높이 760dp 기준으로 배율을 잡고 헤더를 한 줄로, 장식을 생략</td></tr>
+          <tr><th>글자 하한</th><td>배율이 작아져도 16sp 아래로 내려가지 않음(200dpi 에서 20px)</td></tr>
+          <tr><th>터치 하한</th><td>버튼 높이 100dp x 배율, 최소 76dp</td></tr>
+          <tr><th>창 전환</th><td>분할, 단독 전환과 회전에도 게임 상태는 ViewModel 에 남음</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top: .8em"><span class="tag ok">구현·테스트</span> 46개 화면 상태를 12종 크기로 찍은 스냅샷 552장과 크기 견본 12장을 기록본과 비교합니다. <span class="tag emu">에뮬레이터 검증</span> 은 17형 단독 창에서만 했습니다.</p>
+    </div>
+  </div>
+  <div class="sl-foot"><span>근거: <code>ui/Kit.kt</code> Scaled, Dims · <code>ui/src/test/java/com/carescape/ui/PleosScreens.kt</code></span><span>14 / 18</span></div>
+</div></section>
+
+<!-- 15 -->
+<section class="slide"><div class="sl">
+  <div class="sl-head"><p class="eyebrow">화면 규격 12종 대응</p><h2>같은 퍼즐 화면을 12종 앱 창에서 캡처</h2><p>웹 체험판의 화면 선택(주소 옵션 <code>?screen=</code>)으로 뜬 창문 금고 화면입니다. 웹과 Android 는 같은 dp 값과 같은 배율 규칙을 씁니다.</p></div>
+  <div class="sl-body">
+    <div class="thumbs">
+      <figure><div class="shot"><img src="img/size-S17_LAND.jpg" alt="17형 단독 창의 퍼즐 화면"></div><figcaption>S 17형 단독</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-S146_LAND.jpg" alt="14.6형 단독 창의 퍼즐 화면"></div><figcaption>S 14.6형 단독</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-S129_LAND.jpg" alt="12.9형 단독 창의 퍼즐 화면"></div><figcaption>S 12.9형 단독</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WS_LAND.jpg" alt="WS 단독 창의 퍼즐 화면, 컴팩트 레이아웃"></div><figcaption>WS 단독(컴팩트)</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WE_LAND.jpg" alt="WE 단독 창의 퍼즐 화면"></div><figcaption>WE 단독</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WF_LAND.jpg" alt="WF 단독 창의 퍼즐 화면"></div><figcaption>WF 단독</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-S17_PORT.jpg" alt="17형 분할 창의 퍼즐 화면"></div><figcaption>S 17형 분할</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-S146_PORT.jpg" alt="14.6형 분할 창의 퍼즐 화면"></div><figcaption>S 14.6형 분할</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-S129_PORT.jpg" alt="12.9형 분할 창의 퍼즐 화면"></div><figcaption>S 12.9형 분할</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WS_PORT.jpg" alt="WS 분할 창의 퍼즐 화면"></div><figcaption>WS 분할</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WE_PORT.jpg" alt="WE 분할 창의 퍼즐 화면"></div><figcaption>WE 분할</figcaption></figure>
+      <figure><div class="shot"><img src="img/size-WF_PORT.jpg" alt="WF 분할 창의 퍼즐 화면"></div><figcaption>WF 분할</figcaption></figure>
+    </div>
+  </div>
+  <div class="sl-foot"><span><span class="tag web">웹 모사</span> 이 장의 캡처는 웹 체험판입니다. Android 쪽 12종 스냅샷은 <code>ui/src/test/snapshots/images/</code> 에 있습니다.</span><span>15 / 18</span></div>
+</div></section>
+
+<!-- 16 -->
+<section class="slide"><div class="sl dense">
+  <div class="sl-head"><p class="eyebrow">컴포넌트·타이포·색 토큰</p><h2>글자와 대비는 Pleos 기준 이상으로, 색은 테마 묶음으로 관리합니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1fr 1fr 1.1fr">
+    <div>
+      <h3>색 토큰: 기본 테마 "밤하늘"</h3>
+      <div class="sw"><i style="background:#0A111E"></i><b>Bg</b>#0A111E<span>바탕</span></div>
+      <div class="sw"><i style="background:#131C2C"></i><b>Surface</b>#131C2C<span>카드</span></div>
+      <div class="sw"><i style="background:#1C2739"></i><b>Surface2</b>#1C2739<span>버튼</span></div>
+      <div class="sw"><i style="background:#F4F1EA"></i><b>Text</b>#F4F1EA<span>13.3:1</span></div>
+      <div class="sw"><i style="background:#B7C0CE"></i><b>Sub</b>#B7C0CE<span>8.2:1</span></div>
+      <div class="sw"><i style="background:#8590A3"></i><b>Faint</b>#8590A3<span>4.7:1</span></div>
+      <div class="sw"><i style="background:#E8B962"></i><b>Gold</b>#E8B962<span>8.3:1</span></div>
+      <div class="sw"><i style="background:#F2994A"></i><b>Amber</b>#F2994A<span>6.7:1</span></div>
+      <p style="color: var(--ink3); font-size: .72em; margin-top: .6em">대비는 가장 밝은 면인 Surface2 위에서 계산한 최솟값입니다. 금색 버튼 위 글자(#1A1305)는 10.1:1.</p>
+    </div>
+    <div>
+      <h3>타이포</h3>
+      <div class="tbl-s"><table>
+        <thead><tr><th>쓰임</th><th>크기(17형 기준)</th></tr></thead>
+        <tbody>
+          <tr><td>화면 제목</td><td class="num">40sp</td></tr>
+          <tr><td>본문, 버튼 글자</td><td class="num">26~30sp</td></tr>
+          <tr><td>보조 문장, 알약 표시</td><td class="num">22~24sp</td></tr>
+          <tr><td>하한(배율이 작을 때)</td><td class="num">16sp</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top: .6em">서체는 Pleos 디자인 가이드가 지정한 Asta Sans 를 앱에 내장했습니다(OFL). 한국어 줄바꿈은 어절 단위입니다.</p>
+      <h3 style="margin-top: 1em">컴포넌트</h3>
+      <ul>
+        <li>버튼: 높이 100dp, 모서리 32, 글자 30sp. 채움(강조색)과 기본(글자색 9% 면) 두 가지. 비활성은 선과 32% 글자</li>
+        <li>카드: 모서리 32, 1dp 선. 고른 카드는 3dp 강조색 선</li>
+        <li>알약 표시: 추천, 새 기록, 새 배지(누를 수 없음)</li>
+        <li>탭: 높이 100dp 받침에 고른 칸만 채움</li>
+        <li>부품 위치 그림: 위에서 본 차에 움직일 곳을 표시</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Pleos 기준과 비교</h3>
+      <div class="tbl-s"><table>
+        <thead><tr><th>항목</th><th>Pleos 가이드</th><th>카 이스케이프</th></tr></thead>
+        <tbody>
+          <tr><td>대비</td><td>4.5:1 이상</td><td>글자 색 전부 4.7:1 이상. 테마 6종 모두 자동 검사</td></tr>
+          <tr><td>최소 글자</td><td>12sp, 실제 높이 18px 이상</td><td>16sp 이상</td></tr>
+          <tr><td>서체</td><td>Asta Sans</td><td>Asta Sans 내장</td></tr>
+          <tr><td>기본 버튼</td><td>L 높이 100dp, 모서리 32</td><td>같은 값 x 배율, 최소 76dp</td></tr>
+          <tr><td>시스템 화면 모드</td><td>자동, 라이트, 다크</td><td>앱 자체 테마 6종(어두운 5, 밝은 1). 시스템 모드 연동은 <span class="tag plan">계획</span></td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top: .6em; color: var(--ink2)">테마 6종: 밤하늘, 숲속 캠핑, 불꽃 서킷, 바닷속, 우주 정거장, 딸기 우유. 주행 모드를 따라가게 하면 에코는 숲, 스포츠는 불꽃, 노멀은 밤하늘입니다.</p>
+    </div>
+  </div>
+  <div class="sl-foot"><span>근거: <code>ui/Kit.kt</code> Palette, Dims · <code>docs/pleos/components/spec.md</code>, <code>design-intro.txt</code>, <code>typography.txt</code> · 대비 검사 <code>web/selftest.mjs</code></span><span>16 / 18</span></div>
+</div></section>
+
+<!-- 17 -->
+<section class="slide"><div class="sl dense">
+  <div class="sl-head"><p class="eyebrow">접근성·안전 설계</p><h2>아이가 조작해도 안전하도록 상한을 코드에 넣었습니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.2fr 1fr">
+    <div class="tbl-s"><table>
+      <thead><tr><th>위험</th><th>설계</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>주행 중 주의 분산</td><td>세 겹 차단(S07). 주행 중에는 음성도 내지 않음</td><td><code>DriveGuard.kt</code></td></tr>
+        <tr><td>2열 창문을 아이 혼자 조작</td><td>2열 창문 목표는 절반 이하. 창문 잠금이 켜져 있으면 앞좌석 창문 미션으로 바꿈</td><td><code>Puzzles.kt</code> reroll, substitute</td></tr>
+        <tr><td>창문 완전 개방</td><td>목표는 30·50·70% 뿐. 쌍둥이 창문은 20~80% 안</td><td><code>Puzzles.kt</code></td></tr>
+        <tr><td>마른 유리 와이퍼 마모</td><td>목표 최대 3회. 다시 시도까지 합쳐 퍼즐 하나에 6회면 다음으로 넘어감. 연쇄 금고에는 와이퍼를 넣지 않음</td><td>WIPE_CAP</td></tr>
+        <tr><td>카시트를 고정한 뒷좌석 벨트</td><td>벨트 미션은 앞좌석만</td><td>FRONT</td></tr>
+        <tr><td>충전소에서 깜빡이, 와이퍼</td><td>1화는 방향지시등과 와이퍼를 쓰지 않음(변형과 대체로도 넣지 않음)</td><td><code>Episodes.kt</code> avoid</td></tr>
+        <tr><td>무드등이 바뀐 채 남음</td><td>시작 전 값을 저장하고 종료, 주행, 앱 이탈 때 원복. 원래 값 세 가지를 모두 읽은 영역만 바꿈</td><td><code>PleosVehicleGateway.kt</code></td></tr>
+        <tr><td>열선, 창문을 켜 둔 채 출발</td><td>엔딩의 원래대로 출발 목록과 음성 안내</td><td><code>EscapeGame.kt</code> restoreLeft</td></tr>
+      </tbody>
+    </table></div>
+    <div>
+      <h3>접근성</h3>
+      <ul>
+        <li>이야기, 지시, 힌트, 보상을 음성(TTS)으로 함께 읽어 글을 못 읽는 아이도 참여</li>
+        <li>정답은 색(초록 무드등)만이 아니라 효과음, 음성, 화면 문장으로 함께 알림</li>
+        <li>방향은 화살표 그림과 "다음: 왼쪽" 글자를 함께 표시</li>
+        <li>움직일 부품은 이름과 위에서 본 차의 위치 그림으로 함께 표시</li>
+        <li>글자 16sp 이상, 터치 76dp 이상, 대비 4.5:1 이상</li>
+        <li>힌트는 3단계. 마지막 단계는 답에 가까운 안내</li>
+        <li>시간 제한(번개)은 실패가 없고 배지만 걸려 있음</li>
+      </ul>
+      <p style="margin-top: .8em; color: var(--ink2)"><span class="tag plan">계획</span> 화면 낭독기(TalkBack) 점검, 색각 이상 시뮬레이션 점검, Pleos TextToSpeech SDK 로의 전환은 아직 하지 않았습니다. 지금 음성은 Android 표준 TextToSpeech 입니다.</p>
+    </div>
+  </div>
+  <div class="sl-foot"><span>카 이스케이프 화면설계서</span><span>17 / 18</span></div>
+</div></section>
+
+<!-- 18 -->
+<section class="slide"><div class="sl dense">
+  <div class="sl-head"><p class="eyebrow">상태 목록</p><h2>로딩, 빈 상태, 오류, 충전 중단을 화면마다 정해 두었습니다</h2></div>
+  <div class="sl-body cols" style="--cols: 1.5fr 1fr">
+    <div class="tbl-s"><table>
+      <thead><tr><th>종류</th><th>상황</th><th>화면에 보이는 것</th><th>복구</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">로딩</td><td>남은 충전 시간을 아직 모름</td><td>"예상 남은 시간 계산 중", 15분 화 추천</td><td>표본이 모이면 자동 갱신</td></tr>
+        <tr><td>기어를 아직 못 읽음</td><td>S07 정지 안내</td><td>첫 기어 값이 오면 해제</td></tr>
+        <tr><td rowspan="3">빈 상태</td><td>기록, 배지, 일지 없음</td><td>그 영역을 그리지 않음. "우리 가족의 첫 번째 충전 모험"</td><td>한 화를 끝내면 생김</td></tr>
+        <tr><td>주행 모드를 모름</td><td>고정 테마, 차고에 "모름" 표시</td><td>값이 오면 모드 따라가기 적용</td></tr>
+        <tr><td>주행 가능 거리 없음</td><td>거리 문장만 빠짐</td><td>없음(선택 정보)</td></tr>
+        <tr><td rowspan="4">오류</td><td>차에 없는 부품</td><td>오류 없이 다른 퍼즐로 대체</td><td>시작할 때 capability 로 판단</td></tr>
+        <tr><td>차량 서비스 연결 실패</td><td>값이 올 때까지 기본 화면, 기어 미확인이면 S07</td><td>capability 조회를 다시 시도</td></tr>
+        <tr><td>런타임 권한 거부(속도, 충전)</td><td>속도 없이 기어와 주행 제한으로 판단, 충전 목표는 기본 80%</td><td>허용하면 다시 구독</td></tr>
+        <tr><td>음성 엔진 초기화 실패</td><td>화면 문장만으로 진행</td><td>없음(로그만 남김)</td></tr>
+        <tr><td rowspan="3">충전 중단</td><td>퍼즐을 다 푼 뒤 충전이 멈춤</td><td>"충전이 멈췄어요" 엔딩과 현재 충전량</td><td>다음 충전 때 다음 화</td></tr>
+        <tr><td>퍼즐 중 충전이 먼저 끝남</td><td>보너스 엔딩과 남은 퍼즐 이름</td><td>그 화는 다음 충전 때 다시</td></tr>
+        <tr><td>자리를 옮기느라 잠깐 뽑음</td><td>주행 정지 뒤 60초 유예</td><td>다시 꽂으면 이어서</td></tr>
+      </tbody>
+    </table></div>
+    <div>
+      <h3>이 문서의 화면을 다시 뜨는 법</h3>
+      <p>차 그림이나 화면틀이 바뀌면 아래 한 줄로 이미지를 모두 새로 뜹니다.</p>
+      <p><code>python3 submission/tools/capture_screens.py</code></p>
+      <p>PDF 는 <code>submission/tools/build_pdfs.sh</code> 로 다시 만듭니다.</p>
+      <h3 style="margin-top: 1.2em">확인한 날짜</h3>
+      <ul>
+        <li>게임 로직 테스트 90건 통과: 2026-11-15 재실행</li>
+        <li>웹 체험판 대조 검사 41건 통과: 2026-11-15 재실행</li>
+        <li>화면 스냅샷 564장과 UI 테스트 566건: 2026-10-27 실행 기록, 2026-11-15 검증 명령 성공</li>
+        <li>에뮬레이터 실기 검증: 2026-10-23, 10-25 프로젝트 기록</li>
+      </ul>
+      <p style="margin-top: .8em; color: var(--ink2)">실차 검증은 하지 않았습니다. 상세는 근거와 구현 범위 문서를 봐 주세요.</p>
+    </div>
+  </div>
+  <div class="sl-foot"><span>카 이스케이프 화면설계서 · 팀 0won</span><span>18 / 18</span></div>
+</div></section>
+</main>
+
+<footer class="foot noprint">Hyundai, IONIQ, Pleos 및 관련 명칭은 각 소유자의 상표입니다. 이 문서는 공모전 참가자가 만든 제출 자료이며 현대자동차·기아의 공식 문서가 아닙니다.</footer>
+<script>
+// 캡처가 아직 없는 이미지는 그림 칸째로 감춘다(캡처 스크립트가 일부만 성공했을 때).
+document.querySelectorAll('figure img').forEach((im) => { const hide = () => { im.closest('figure').hidden = true; }; if (im.complete && !im.naturalWidth) hide(); else im.addEventListener('error', hide); });
+</script>
+</body>
+</html>

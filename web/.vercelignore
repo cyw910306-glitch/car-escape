@@ -1,0 +1,20 @@
+_qa/
+selftest*
+*.mjs
+*.py
+voice/design/
+voice/*.wav
+voice/clips/*.wav
+voice/lines.json
+voice/bad.json
+voice/gen.log
+# f9 보안 보강: 서빙 안 되는 소스·비밀 제외
+*.md
+*.sh
+.env*
+/tests/
+/tools/
+/scripts/
+/audits/
+__pycache__/
+.DS_Store

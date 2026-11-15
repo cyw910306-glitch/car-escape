@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카 이스케이프 출처와 라이선스</title>
+<meta name="description" content="카 이스케이프에 쓴 글꼴, 라이브러리, 자체 제작물의 출처와 라이선스, 상표 고지.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Asta+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="docs.css">
+<style>@page { size: A4; margin: 16mm 14mm 18mm; }</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./">카 이스케이프<small>제출 자료</small></a>
+  <nav aria-label="제출 자료">
+    <a href="./">자료 모음</a><a href="ux.html">화면설계서</a><a href="spec.html">개발 상세 사양</a><a href="evidence.html">근거와 구현 범위</a><a href="credits.html" aria-current="page">출처·라이선스</a><a href="../">시연 열기</a>
+  </nav>
+</div></header>
+
+<main class="doc">
+  <p class="eyebrow">출처·라이선스</p>
+  <h1>남의 것은 출처를 밝히고, 나머지는 직접 만들었습니다</h1>
+  <p class="lead">앱과 웹 체험판, 이 제출 자료에 들어간 글꼴과 라이브러리의 라이선스, 그리고 자체 제작물의 범위를 적습니다. 현대자동차, 기아, Pleos 의 공식 사진이나 로고 파일은 쓰지 않았습니다.</p>
+  <p class="meta">2026-11-15 기준</p>
+
+  <h2><span class="no">1</span>글꼴</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>글꼴</th><th>저작권자</th><th>라이선스</th><th>쓰는 곳</th></tr></thead>
+    <tbody>
+      <tr><th>Asta Sans</th><td>The Asta Sans Project Authors(42dot), 2024</td><td>SIL Open Font License 1.1</td><td>Android 앱에 Regular, SemiBold, Bold 내장. 웹 체험판과 이 문서는 Google Fonts 에서 불러옴</td></tr>
+    </tbody>
+  </table></div>
+  <p>Asta Sans 는 Pleos 디자인 가이드가 지정한 시스템 서체입니다. 라이선스 전문은 소스 저장소의 <code>docs/licenses/AstaSans-OFL.txt</code> 에 있습니다. 현대자동차 전용 서체는 쓰지 않았습니다.</p>
+
+  <h2><span class="no">2</span>라이브러리</h2>
+  <h3>Android 앱</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>이름</th><th>버전</th><th>라이선스</th><th>쓰임</th></tr></thead>
+    <tbody>
+      <tr><th>Pleos Vehicle SDK</th><td>2.3.2</td><td>Pleos Playground 가 제공하는 SDK. 이용 조건은 Pleos Playground 약관을 따름</td><td>차량 신호 읽기, 무드등 쓰기</td></tr>
+      <tr><th>Kotlin, kotlinx.coroutines</th><td>2.3.21, 1.10.2</td><td>Apache License 2.0</td><td>언어, 비동기 흐름</td></tr>
+      <tr><th>Jetpack Compose, Material 3, Activity Compose</th><td>BOM 2025.07.00, 1.10.1</td><td>Apache License 2.0</td><td>화면</td></tr>
+      <tr><th>Android Automotive <code>android.car</code></th><td>플랫폼</td><td>Android 플랫폼 라이브러리</td><td>기어, 속도, 충전 상태, 주행 제한</td></tr>
+      <tr><th>JUnit</th><td>4.13.2</td><td>Eclipse Public License 1.0</td><td>테스트 전용. 앱에 포함되지 않음</td></tr>
+      <tr><th>Paparazzi</th><td>2.0.0-alpha04</td><td>Apache License 2.0</td><td>화면 스냅샷 테스트 전용. 앱에 포함되지 않음</td></tr>
+    </tbody>
+  </table></div>
+  <h3>웹 체험판</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>이름</th><th>버전</th><th>라이선스</th><th>쓰임</th></tr></thead>
+    <tbody>
+      <tr><th>three.js (GLTFLoader, OrbitControls, RoomEnvironment 포함)</th><td>0.160.0</td><td>MIT License</td><td>3D 차 그리기. jsDelivr CDN 에서 불러옴</td></tr>
+    </tbody>
+  </table></div>
+  <p>그 밖의 웹 코드(게임 엔진, 화면, 가상 차량 패널)는 외부 라이브러리 없이 직접 작성했습니다. 이 제출 자료 페이지는 라이브러리를 쓰지 않습니다.</p>
+
+  <h2><span class="no">3</span>자체 제작물</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>항목</th><th>만든 방법</th></tr></thead>
+    <tbody>
+      <tr><th>3D 차 모델과 차 그림</th><td>공개된 제원 치수를 바탕으로 Blender 에서 직접 모델링한 양식화 모델입니다. 공식 사진은 형태를 참고하는 데만 썼고, 공식 이미지나 3D 자산은 들어 있지 않습니다. 제조사 로고와 엠블럼은 넣지 않았습니다</td></tr>
+      <tr><th>화면 이미지</th><td>이 자료의 화면 이미지는 모두 자체 앱의 캡처입니다. 웹 체험판을 헤드리스 브라우저로 캡처한 것과 Android 화면 스냅샷(Paparazzi) 두 종류입니다</td></tr>
+      <tr><th>웹 체험판의 차량 화면틀</th><td>상태바, 주행 정보 화면, 하단 바는 Pleos Connect Emulator 화면의 치수를 재서 직접 그린 모사입니다. 아이콘은 직접 그린 SVG 이고 공식 UI 이미지를 쓰지 않았습니다</td></tr>
+      <tr><th>앱 아이콘, 퍼즐 그림, 스티커</th><td>코드(Compose Canvas, SVG)로 직접 그렸습니다</td></tr>
+      <tr><th>이야기, 지시문, 힌트</th><td>직접 썼습니다</td></tr>
+      <tr><th>웹 체험판 음성</th><td>오픈소스 음성 합성 모델 VoxCPM2(OpenBMB, Apache License 2.0)로 만든 합성 음성입니다. 목소리는 설명 문장으로 만든 것이며 실존 인물의 목소리가 아닙니다. Android 앱은 기기의 TTS 엔진으로 읽습니다</td></tr>
+      <tr><th>효과음</th><td>Android 는 시스템 톤(ToneGenerator), 웹은 코드로 합성한 소리입니다. 음원 파일을 쓰지 않습니다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="no">4</span>참고한 공식 문서</h2>
+  <ul>
+    <li>Pleos Playground 개발 문서: Vehicle SDK, 주행 규제 개발 가이드, 디자인 가이드(레이아웃, 색, 타이포그래피, 컴포넌트), 폼팩터 테스트 가이드, Virtual Console 가이드</li>
+    <li>Pleos Connect Emulator v2.1.0: 폼팩터 콘솔의 앱 창 크기 표시값, 시스템 화면의 치수</li>
+    <li>공모전 공식 안내 페이지의 제출 규정과 심사 기준</li>
+  </ul>
+  <p>위 문서의 문장이나 그림을 이 자료에 옮겨 싣지 않았습니다. 수치(앱 창 dp, 대비 기준, 글자 크기 기준)만 인용했습니다.</p>
+
+  <h2><span class="no">5</span>상표 고지</h2>
+  <ul>
+    <li>Hyundai, IONIQ, 아이오닉, Kia, Pleos, Pleos Connect, Pleos Playground 및 관련 명칭은 각 소유자의 상표입니다.</li>
+    <li>Android, Google Fonts 는 Google LLC 의 상표입니다.</li>
+    <li>카 이스케이프는 공모전 참가자가 만든 출품작이며 현대자동차·기아의 공식 제품이나 서비스가 아닙니다. 이 자료도 공식 문서가 아닙니다.</li>
+    <li>차량 이름은 기준 차량을 설명하기 위해서만 썼습니다.</li>
+  </ul>
+</main>
+<footer class="foot">팀 0won · 현대자동차그룹 차량용 앱 개발 공모전 출품작 보조 자료</footer>
+</body>
+</html>
