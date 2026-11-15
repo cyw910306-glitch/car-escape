@@ -891,12 +891,14 @@
   const frameEl = document.getElementById('frame');
   const VARS = { bg: '--bg', deep: '--bg-deep', surface: '--surface', surface2: '--surface2', line: '--line', text: '--text', sub: '--sub', faint: '--faint', gold: '--gold', amber: '--amber', onGold: '--on-gold', top: '--top' };
   let curSkin = 'NIGHT_SKY';
-  /** Theme pack: K for the drawings, CSS variables for the rest. 밤하늘 = style.css as is (nothing set). */
+  let sysLight = false; // Pleos 시스템 라이트 모드: 앱도 같은 테마의 밝은 색으로 따라간다 (layoutDevice 가 맞춘다)
+  /** Theme pack: K for the drawings, CSS variables for the rest. 밤하늘(다크) = style.css as is (nothing set). */
   function applySkin(id) {
     curSkin = id; curLayout = '';
-    const sk = CE.SKINS[id];
+    const sk = sysLight ? CE.SKINS_LIGHT[id] : CE.SKINS[id];
+    const plain = id === 'NIGHT_SKY' && !sysLight;
     for (const k of Object.keys(K)) K[k] = sk[k];
-    for (const [k, v] of Object.entries(VARS)) { if (id === 'NIGHT_SKY') frameEl.style.removeProperty(v); else frameEl.style.setProperty(v, sk[k]); }
+    for (const [k, v] of Object.entries(VARS)) { if (plain) frameEl.style.removeProperty(v); else frameEl.style.setProperty(v, sk[k]); }
     if (id === 'NIGHT_SKY') delete frameEl.dataset.skin; else frameEl.dataset.skin = id;
     frameEl.style.colorScheme = sk.light ? 'light' : '';
   }
@@ -1048,6 +1050,7 @@
       : `차량 화면 미리보기 · Connect-${screen.split('_')[0].replace(/\d+$/, '')} ${PANEL[screen.split('_')[0]]} · 앱 창 ${w}×${h} dp (${split ? '분할' : '단독'}) · ${Math.round(f * 100)}%`;
     screenSel.value = screen;
     document.querySelectorAll('[data-pl-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.plMode === plMode)));
+    if (sysLight !== (plMode === 'light')) { sysLight = plMode === 'light'; applySkin(curSkin); render(); }
   }
   screenSel.addEventListener('change', () => { screen = screenSel.value; store.set('carescape.screen', screen); layoutDevice(); });
   document.querySelectorAll('[data-pl-mode]').forEach((b) => b.addEventListener('click', () => { plMode = b.dataset.plMode; store.set('carescape.plmode', plMode); layoutDevice(); }));

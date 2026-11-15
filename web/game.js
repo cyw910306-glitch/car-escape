@@ -1197,6 +1197,18 @@
     SPACE_STATION: { bg: '#0D0B1E', deep: '#06050F', surface: '#17142E', surface2: '#221E3E', line: 'rgba(217,212,242,0.25)', text: '#F3F1FA', sub: '#BDB8D6', faint: '#8E89AB', gold: '#A99BFF', amber: '#6FE3E8', onGold: '#0E0A24', top: '#15122E' },
     STRAWBERRY_MILK: { bg: '#FFF4F7', deep: '#FCE6ED', surface: '#FFFFFF', surface2: '#FBE9EF', line: 'rgba(138,58,85,0.3)', text: '#3A1A26', sub: '#6B4150', faint: '#7E5464', gold: '#C2185B', amber: '#9C3D78', onGold: '#FFFFFF', top: '#FFFAFC', light: true },
   };
+  /**
+   * 시스템 라이트 모드일 때 쓰는 테마별 밝은 색(웹 체험판). 같은 포인트 색 계열을 유지하고 글자 대비 4.5:1 이상(selftest 가 검사).
+   * 딸기 우유는 원래 밝은 테마라 그대로 쓴다.
+   */
+  const SKINS_LIGHT = {
+    NIGHT_SKY: { bg: '#F4F6FA', deep: '#E6EAF2', surface: '#FFFFFF', surface2: '#EDF0F6', line: 'rgba(30,45,75,0.28)', text: '#111A2B', sub: '#414C60', faint: '#566074', gold: '#7A4F00', amber: '#8F4508', onGold: '#FFFFFF', top: '#FBFCFE', light: true },
+    FOREST_CAMP: { bg: '#F2F8F1', deep: '#E2EFE1', surface: '#FFFFFF', surface2: '#E9F3E8', line: 'rgba(30,70,40,0.28)', text: '#102317', sub: '#3C5444', faint: '#4F6657', gold: '#17662D', amber: '#7A4F00', onGold: '#FFFFFF', top: '#FAFDF9', light: true },
+    RACING: { bg: '#FBF3F1', deep: '#F5E3DF', surface: '#FFFFFF', surface2: '#F8E9E5', line: 'rgba(110,40,30,0.28)', text: '#2A1210', sub: '#5E3F3A', faint: '#6E504B', gold: '#B02A16', amber: '#854700', onGold: '#FFFFFF', top: '#FFFAF9', light: true },
+    UNDERSEA: { bg: '#EFF8FB', deep: '#DDEFF5', surface: '#FFFFFF', surface2: '#E4F2F7', line: 'rgba(20,80,100,0.28)', text: '#0A222C', sub: '#365561', faint: '#48646F', gold: '#085E77', amber: '#0B6653', onGold: '#FFFFFF', top: '#F9FDFE', light: true },
+    SPACE_STATION: { bg: '#F5F4FC', deep: '#E7E4F6', surface: '#FFFFFF', surface2: '#ECEAF8', line: 'rgba(50,40,110,0.28)', text: '#17132E', sub: '#454064', faint: '#575276', gold: '#4D3AC4', amber: '#0B626C', onGold: '#FFFFFF', top: '#FBFAFE', light: true },
+    STRAWBERRY_MILK: SKINS.STRAWBERRY_MILK,
+  };
   /** WCAG contrast ratio of two #RRGGBB colors. */
   function contrast(a, b) {
     const lum = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
@@ -1210,6 +1222,6 @@
     Spec, input, inputs, title, prompt, chip, hints, kind, number, substitute, roll, reroll, riddle, fit, demo,
     PuzzleRun, Episodes, ChargeClock, simCharge, SIM_CHARGE_PER_MIN, SIM_METERS_PER_PERCENT, TIMELAPSE, EscapeGame, seatName, epochDay,
     DriveMode, DRIVE_MODE_NAME, Need, needHint, Paint, Wheel, STICKERS, StickerSlot, Theme, DEFAULT_MODE_THEMES, CATALOG, isOpen, byId, newlyOpened,
-    look, themeOf, moodOf, shownTheme, shownMood, encodeLook, decodeLook, SKINS, contrast,
+    look, themeOf, moodOf, shownTheme, shownMood, encodeLook, decodeLook, SKINS, SKINS_LIGHT, contrast,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

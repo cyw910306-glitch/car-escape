@@ -2,7 +2,7 @@
 
 EV 충전을 기다리는 15~30분 동안, 가족이 **차 자체를 조작해** 퍼즐을 푸는 협동 방탈출 게임입니다.
 
-현대자동차그룹 차량용 앱 개발 공모전 출품작입니다. 팀 **0won**. 기준 차량은 3열 7인승 전기 SUV 아이오닉 9, 실행 환경은 Pleos Connect(Android Automotive)입니다.
+현대자동차그룹 차량용 앱 개발 공모전 출품작입니다. 팀 **카 이스케이프**(제작 표기와 APK 파일명의 0won 은 팀 활동명입니다). 기준 차량은 3열 7인승 전기 SUV 아이오닉 9, 실행 환경은 Pleos Connect(Android Automotive)입니다.
 
 - 패키지 `com.carescape.app` · 버전 0.1.0 · minSdk 28 · targetSdk 35
 - release APK: [`apk/0won_CarEscape_release.apk`](apk/0won_CarEscape_release.apk)

@@ -477,7 +477,7 @@ t('IntegrationTest: map15 with driving pause and x30 timelapse', () => {
 
 // ---------------------------------------------------------------- CustomizationTest.kt (마이 차고)
 {
-  const { Paint, Wheel, STICKERS, Theme, DEFAULT_MODE_THEMES, DriveMode, CATALOG, isOpen, byId, newlyOpened, needHint, Need, look, encodeLook, decodeLook, shownTheme, shownMood, SKINS, contrast, KINDS } = CE;
+  const { Paint, Wheel, STICKERS, Theme, DEFAULT_MODE_THEMES, DriveMode, CATALOG, isOpen, byId, newlyOpened, needHint, Need, look, encodeLook, decodeLook, shownTheme, shownMood, SKINS, SKINS_LIGHT, contrast, KINDS } = CE;
   const E = (o = {}) => ({ stars: 0, badges: [], clears: 0, ...o });
   const ids = (xs) => xs.map((x) => x.id);
 
@@ -552,7 +552,8 @@ t('IntegrationTest: map15 with driving pause and x30 timelapse', () => {
     const css = _readCss();
     for (const [k, v] of Object.entries({ bg: '--bg', deep: '--bg-deep', surface: '--surface', surface2: '--surface2', text: '--text', sub: '--sub', faint: '--faint', gold: '--gold', amber: '--amber', onGold: '--on-gold' }))
       assert.ok(new RegExp(`${v}:\\s*${SKINS.NIGHT_SKY[k]}\\b`, 'i').test(css), `NIGHT_SKY.${k} = style.css ${v}`);
-    for (const [id, s] of Object.entries(SKINS)) {
+    assert.deepEqual(Object.keys(SKINS_LIGHT), ids(Theme));
+    for (const [id, s] of [...Object.entries(SKINS), ...Object.entries(SKINS_LIGHT).map(([k, v]) => [k + ' (light)', v])]) {
       for (const fg of ['text', 'sub', 'faint', 'gold', 'amber']) for (const bg of ['bg', 'deep', 'surface', 'surface2', 'top'])
         assert.ok(contrast(s[fg], s[bg]) >= 4.5, `${id}: ${fg} on ${bg} = ${contrast(s[fg], s[bg]).toFixed(2)}`);
       for (const bg of ['gold', 'amber']) assert.ok(contrast(s.onGold, s[bg]) >= 4.5, `${id}: onGold on ${bg} = ${contrast(s.onGold, s[bg]).toFixed(2)}`);
