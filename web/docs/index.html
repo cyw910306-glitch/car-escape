@@ -89,7 +89,7 @@
 const DOWNLOADS = [
   { file: '카이스케이프_화면설계서.pdf', label: '화면설계서 PDF', note: '16:9, 18쪽' },
   { file: '카이스케이프_개발상세사양.pdf', label: '개발 상세 사양 PDF', note: 'A4' },
-  { file: '카이스케이프_시연영상.mp4', url: '', label: '시연 영상', note: 'MP4' },
+  { file: 'carescape-demo.mp4', url: '', label: '시연 영상', note: 'MP4 · 1분 57초 · 1920×1080' },
   { file: '카이스케이프_소스.zip', url: '', label: '소스와 APK', note: 'ZIP' },
 ];
 fetch('downloads/files.json').then((r) => (r.ok ? r.json() : [])).catch(() => []).then((names) => {

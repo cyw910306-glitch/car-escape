@@ -7,6 +7,8 @@ EV 충전을 기다리는 15~30분 동안, 가족이 **차 자체를 조작해**
 - 패키지 `com.carescape.app` · 버전 0.1.0 · minSdk 28 · targetSdk 35
 - release APK: [`apk/0won_CarEscape_release.apk`](apk/0won_CarEscape_release.apk)
 - 웹 체험판(차 없이 브라우저로 해 보기): https://car-escape-play.vercel.app
+- 시연 영상(1분 57초, 에뮬레이터 실기 녹화 중심): https://car-escape-play.vercel.app/docs/downloads/carescape-demo.mp4
+- 화면설계서, 개발 상세 사양, 근거와 구현 범위: https://car-escape-play.vercel.app/docs/
 
 ## 1. 주요 기능
 
